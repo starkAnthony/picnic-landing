@@ -9,6 +9,7 @@ export default function Navbar() {
 
   const links = [
     { href: '#packages', label: t.nav.packages },
+    { href: '#news', label: t.nav.news },
     { href: '#gallery', label: t.nav.gallery },
     { href: '#how-it-works', label: t.nav.howItWorks },
     { href: '#reviews', label: t.nav.reviews },

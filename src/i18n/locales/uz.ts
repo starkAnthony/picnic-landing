@@ -10,6 +10,7 @@ const uz: Translations = {
   nav: {
     packages: 'Xizmatlar',
     gallery: 'Galereya',
+    news: 'Yangiliklar',
     howItWorks: 'Qanday ishlaydi',
     reviews: 'Sharhlar',
     book: 'Bron',
@@ -38,6 +39,21 @@ const uz: Translations = {
     subtitle:
       'Foto zonalar, bayram bezaklari va piknik tadbirlari. Ko‘proq surat va videolar Instagramda.',
     viewMore: 'Instagramda ko‘rish',
+    loading: 'Yuklanmoqda…',
+  },
+  instagram: {
+    title: 'Instagramdan',
+    subtitle: 'So‘nggi surat va videolar — jonli lenta (sozlanganida).',
+    loading: 'Yuklanmoqda…',
+    notConnected: 'Instagram API ulanmagan. Hozircha profilingizga o‘ting:',
+    viewMore: 'Instagramda ko‘rish',
+  },
+  news: {
+    label: 'Yangiliklar',
+    title: 'Yangiliklar va tadbirlar',
+    news: 'Yangilik',
+    event: 'Tadbir',
+    loading: 'Yuklanmoqda…',
   },
   packages: {
     label: 'Xizmatlar',
@@ -63,7 +79,7 @@ const uz: Translations = {
       {
         name: 'Tadbir dizayni va tashkillashtirish',
         description:
-          'Tug‘ilgan kun, «Menga turmush qur», uchrashuvlar va boshqa ochiq havoda bayramlar uchun shaxsiy g‘oya, bezak va tashkil etish.',
+          'Tug‘ilgan kun, «Menga turmushga chiq», uchrashuvlar va boshqa ochiq havoda bayramlar uchun shaxsiy g‘oya, bezak va tashkil etish.',
         features: [
           'Tug‘ilgan kun va yubiley',
           'Taklif (marry me) va romantik tadbirlar',
@@ -117,13 +133,13 @@ const uz: Translations = {
       },
       {
         quote:
-          '«Menga turmush qur» uchun tashkillashtirishdi. Har narsa vaqtida, romantik va juda chiroyli bo‘ldi. Rahmat, Sevinc!',
+          '«Menga turmushga chiq» uchun tashkillashtirishdi. Har narsa vaqtida, romantik va juda chiroyli bo‘ldi. Rahmat, Sevinc!',
         name: 'Kamola va Sardor',
         occasion: 'Taklif',
       },
       {
         quote:
-          'Piknik stoli va adyolalarni ijaraga oldik — o‘zimiz ham tez bezadik. Sifat yaxshi, qaytarish oson bo‘ldi.',
+          'Piknik stoli va adyollalarni ijaraga oldik — o‘zimiz ham tez bezadik. Sifat yaxshi, qaytarish oson bo‘ldi.',
         name: 'Nilufar A.',
         occasion: 'Ijara',
       },

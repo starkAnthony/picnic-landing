@@ -2,6 +2,11 @@
   background: var(--cream-dark);
 }
 
+.gallery-loading {
+  margin-top: 1.5rem;
+  color: var(--muted);
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

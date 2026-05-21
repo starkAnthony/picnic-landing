@@ -10,6 +10,7 @@ const en: Translations = {
   nav: {
     packages: 'Services',
     gallery: 'Gallery',
+    news: 'News',
     howItWorks: 'How It Works',
     reviews: 'Reviews',
     book: 'Book',
@@ -37,6 +38,21 @@ const en: Translations = {
     title: 'Our work',
     subtitle: 'Photo zones, party décor, and picnic setups. More photos and videos on Instagram.',
     viewMore: 'View on Instagram',
+    loading: 'Loading…',
+  },
+  instagram: {
+    title: 'From Instagram',
+    subtitle: 'Latest photos and videos — live feed when connected.',
+    loading: 'Loading…',
+    notConnected: 'Instagram API not connected. Visit profile:',
+    viewMore: 'View on Instagram',
+  },
+  news: {
+    label: 'News',
+    title: 'News & events',
+    news: 'News',
+    event: 'Event',
+    loading: 'Loading…',
   },
   packages: {
     label: 'Services',

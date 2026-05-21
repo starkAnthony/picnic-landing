@@ -1,25 +1,14 @@
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import Packages from './components/Packages'
-import Gallery from './components/Gallery'
-import HowItWorks from './components/HowItWorks'
-import Testimonials from './components/Testimonials'
-import Booking from './components/Booking'
-import Footer from './components/Footer'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import HomePage from './pages/HomePage'
+import AdminPage from './pages/AdminPage'
 
 export default function App() {
   return (
-    <>
-      <Navbar />
-      <main>
-        <Hero />
-        <Packages />
-        <Gallery />
-        <HowItWorks />
-        <Testimonials />
-        <Booking />
-      </main>
-      <Footer />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+      </Routes>
+    </BrowserRouter>
   )
 }

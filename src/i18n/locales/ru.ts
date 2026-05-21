@@ -10,6 +10,7 @@ const ru: Translations = {
   nav: {
     packages: 'Услуги',
     gallery: 'Галерея',
+    news: 'Новости',
     howItWorks: 'Как это работает',
     reviews: 'Отзывы',
     book: 'Заказ',
@@ -38,6 +39,21 @@ const ru: Translations = {
     subtitle:
       'Фотозоны, декор праздников и пикниковые оформления. Больше фото и видео в Instagram.',
     viewMore: 'Смотреть в Instagram',
+    loading: 'Загрузка…',
+  },
+  instagram: {
+    title: 'Из Instagram',
+    subtitle: 'Свежие фото и видео — живая лента при подключении API.',
+    loading: 'Загрузка…',
+    notConnected: 'Instagram API не подключён. Профиль:',
+    viewMore: 'Смотреть в Instagram',
+  },
+  news: {
+    label: 'Новости',
+    title: 'Новости и события',
+    news: 'Новость',
+    event: 'Событие',
+    loading: 'Загрузка…',
   },
   packages: {
     label: 'Услуги',

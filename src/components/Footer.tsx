@@ -27,6 +27,7 @@ export default function Footer() {
           <div>
             <h4>{t.footer.explore}</h4>
             <a href="#packages">{t.nav.packages}</a>
+            <a href="#news">{t.nav.news}</a>
             <a href="#gallery">{t.nav.gallery}</a>
             <a href="#how-it-works">{t.nav.howItWorks}</a>
             <a href="#reviews">{t.nav.reviews}</a>

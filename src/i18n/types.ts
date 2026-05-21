@@ -36,6 +36,7 @@ export type Translations = {
   nav: {
     packages: string
     gallery: string
+    news: string
     howItWorks: string
     reviews: string
     book: string
@@ -63,6 +64,21 @@ export type Translations = {
     title: string
     subtitle: string
     viewMore: string
+    loading: string
+  }
+  instagram: {
+    title: string
+    subtitle: string
+    loading: string
+    notConnected: string
+    viewMore: string
+  }
+  news: {
+    label: string
+    title: string
+    news: string
+    event: string
+    loading: string
   }
   packages: {
     label: string
