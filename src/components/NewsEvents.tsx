@@ -21,7 +21,14 @@ export default function NewsEvents() {
             {posts.map((post) => (
               <article key={post.id} className="news-card">
                 {post.image_url && (
-                  <img src={post.image_url} alt="" loading="lazy" className="news-card-image" />
+                  <div className="news-card-image-wrap">
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      loading="lazy"
+                      className="news-card-image"
+                    />
+                  </div>
                 )}
                 <div className="news-card-body">
                   <span className={`news-type news-type-${post.post_type}`}>

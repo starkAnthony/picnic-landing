@@ -21,10 +21,20 @@
   box-shadow: var(--shadow-md);
 }
 
+.news-card-image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream-dark);
+  padding: 0.5rem;
+}
+
 .news-card-image {
+  display: block;
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  height: auto;
+  max-height: min(360px, 55vh);
+  object-fit: contain;
 }
 
 .news-card-body {

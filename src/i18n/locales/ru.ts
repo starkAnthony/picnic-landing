@@ -40,6 +40,9 @@ const ru: Translations = {
       'Фотозоны, декор праздников и пикниковые оформления. Больше фото и видео в Instagram.',
     viewMore: 'Смотреть в Instagram',
     loading: 'Загрузка…',
+    prev: 'Предыдущие фото',
+    next: 'Следующие фото',
+    slide: 'Слайд',
   },
   instagram: {
     title: 'Из Instagram',

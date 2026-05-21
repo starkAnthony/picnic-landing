@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { galleryImages as staticGallery, heroImage as staticHero } from '../data/gallery'
+import { galleryImages as staticGallery } from '../data/gallery'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { GalleryItem } from '../types/content'
 
@@ -12,7 +12,6 @@ const staticItems: GalleryItem[] = staticGallery.map((g, i) => ({
 
 export function useGallery() {
   const [items, setItems] = useState<GalleryItem[]>(staticItems)
-  const [heroSrc, setHeroSrc] = useState(staticHero.src)
   const [loading, setLoading] = useState(isSupabaseConfigured)
 
   useEffect(() => {
@@ -33,5 +32,5 @@ export function useGallery() {
       })
   }, [])
 
-  return { items, heroSrc, setHeroSrc, loading, usingCms: isSupabaseConfigured }
+  return { items, loading, usingCms: isSupabaseConfigured }
 }

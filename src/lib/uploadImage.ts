@@ -14,8 +14,13 @@ function readFileAsBase64(file: File): Promise<string> {
   })
 }
 
-/** Upload via server (bypasses Storage RLS). Requires SUPABASE_SERVICE_ROLE_KEY on Vercel. */
-export async function uploadGalleryImage(file: File): Promise<{ ok: true } | { ok: false; error: string }> {
+type UploadKind = 'gallery' | 'post'
+
+export type UploadResult =
+  | { ok: true; image_url: string }
+  | { ok: false; error: string }
+
+async function uploadImageFile(file: File, kind: UploadKind): Promise<UploadResult> {
   if (!supabase) {
     return { ok: false, error: 'Supabase not configured' }
   }
@@ -43,10 +48,11 @@ export async function uploadGalleryImage(file: File): Promise<{ ok: true } | { o
       fileName: file.name,
       contentType: file.type,
       data: base64,
+      kind,
     }),
   })
 
-  let body: { error?: string } = {}
+  let body: { error?: string; image_url?: string } = {}
   try {
     body = await res.json()
   } catch {
@@ -54,7 +60,7 @@ export async function uploadGalleryImage(file: File): Promise<{ ok: true } | { o
   }
 
   if (res.status === 404) {
-    return uploadGalleryDirect(file)
+    return uploadImageDirect(file, kind)
   }
 
   if (res.status === 503) {
@@ -62,40 +68,49 @@ export async function uploadGalleryImage(file: File): Promise<{ ok: true } | { o
       ok: false,
       error:
         body.error ??
-        'Vercel-da SUPABASE_SERVICE_ROLE_KEY qo‘ying va qayta deploy qiling. Yoki Supabase SQL Editor-da fix-storage-rls.sql ni ishga tushiring.',
+        'Vercel-da SUPABASE_SERVICE_ROLE_KEY qo‘ying va qayta deploy qiling.',
     }
   }
 
-  if (!res.ok) {
+  if (!res.ok || !body.image_url) {
     return { ok: false, error: body.error ?? `Upload failed (${res.status})` }
   }
 
-  return { ok: true }
+  return { ok: true, image_url: body.image_url }
 }
 
-/** Direct upload (local npm run dev only — needs fix-storage-rls.sql) */
-async function uploadGalleryDirect(
-  file: File,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+async function uploadImageDirect(file: File, kind: UploadKind): Promise<UploadResult> {
   if (!supabase) return { ok: false, error: 'Supabase not configured' }
 
   const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = `${Date.now()}.${ext}`
+  const path = kind === 'post' ? `posts/${Date.now()}.${ext}` : `${Date.now()}.${ext}`
   const { error: upErr } = await supabase.storage.from('gallery').upload(path, file)
   if (upErr) {
     return {
       ok: false,
       error: upErr.message.includes('row-level security')
-        ? `${upErr.message} — Vercel-da SUPABASE_SERVICE_ROLE_KEY qo‘ying yoki fix-storage-rls.sql ishga tushiring.`
+        ? `${upErr.message} — fix-storage-rls.sql yoki SUPABASE_SERVICE_ROLE_KEY`
         : upErr.message,
     }
   }
   const { data } = supabase.storage.from('gallery').getPublicUrl(path)
-  const { error: rowErr } = await supabase.from('gallery_items').insert({
-    image_url: data.publicUrl,
-    alt: 'Sevinc Picnic',
-    sort_order: 0,
-  })
-  if (rowErr) return { ok: false, error: rowErr.message }
-  return { ok: true }
+
+  if (kind === 'gallery') {
+    const { error: rowErr } = await supabase.from('gallery_items').insert({
+      image_url: data.publicUrl,
+      alt: 'Sevinc Picnic',
+      sort_order: 0,
+    })
+    if (rowErr) return { ok: false, error: rowErr.message }
+  }
+
+  return { ok: true, image_url: data.publicUrl }
+}
+
+export function uploadGalleryImage(file: File): Promise<UploadResult> {
+  return uploadImageFile(file, 'gallery')
+}
+
+export function uploadPostImage(file: File): Promise<UploadResult> {
+  return uploadImageFile(file, 'post')
 }

@@ -39,6 +39,9 @@ const en: Translations = {
     subtitle: 'Photo zones, party décor, and picnic setups. More photos and videos on Instagram.',
     viewMore: 'View on Instagram',
     loading: 'Loading…',
+    prev: 'Previous photos',
+    next: 'Next photos',
+    slide: 'Slide',
   },
   instagram: {
     title: 'From Instagram',

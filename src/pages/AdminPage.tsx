@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
-import { uploadGalleryImage } from '../lib/uploadGallery'
+import { uploadGalleryImage, uploadPostImage } from '../lib/uploadImage'
 import type { GalleryItem, Post } from '../types/content'
 import './AdminPage.css'
 
@@ -17,8 +17,11 @@ export default function AdminPage() {
   const [postBody, setPostBody] = useState('')
   const [postType, setPostType] = useState<'news' | 'event'>('news')
   const [postDate, setPostDate] = useState('')
-  const [postImageUrl, setPostImageUrl] = useState('')
+  const [postImageFile, setPostImageFile] = useState<File | null>(null)
+  const [postImagePreview, setPostImagePreview] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+  const [postSubmitting, setPostSubmitting] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -58,15 +61,28 @@ export default function AdminPage() {
     await supabase?.auth.signOut()
   }
 
-  async function uploadImage(file: File) {
+  async function uploadImages(files: FileList) {
+    const list = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (list.length === 0) return
+
     setUploading(true)
     setError('')
-    const result = await uploadGalleryImage(file)
-    setUploading(false)
-    if (!result.ok) {
-      setError(result.error)
-      return
+    let done = 0
+
+    for (const file of list) {
+      setUploadProgress(`${done + 1} / ${list.length}`)
+      const result = await uploadGalleryImage(file)
+      if (!result.ok) {
+        setError(result.error)
+        setUploading(false)
+        setUploadProgress('')
+        return
+      }
+      done += 1
     }
+
+    setUploading(false)
+    setUploadProgress('')
     loadData()
   }
 
@@ -75,22 +91,55 @@ export default function AdminPage() {
     loadData()
   }
 
+  function clearPostImage() {
+    if (postImagePreview) URL.revokeObjectURL(postImagePreview)
+    setPostImageFile(null)
+    setPostImagePreview(null)
+  }
+
+  function onPostImageSelect(file: File | undefined) {
+    if (!file) return
+    clearPostImage()
+    setPostImageFile(file)
+    setPostImagePreview(URL.createObjectURL(file))
+  }
+
   async function addPost(e: FormEvent) {
     e.preventDefault()
     if (!supabase) return
     setError('')
-    await supabase.from('posts').insert({
+    setPostSubmitting(true)
+
+    let imageUrl: string | null = null
+    if (postImageFile) {
+      const uploaded = await uploadPostImage(postImageFile)
+      if (!uploaded.ok) {
+        setError(uploaded.error)
+        setPostSubmitting(false)
+        return
+      }
+      imageUrl = uploaded.image_url
+    }
+
+    const { error: insertErr } = await supabase.from('posts').insert({
       title: postTitle,
       body: postBody,
       post_type: postType,
       event_date: postDate || null,
-      image_url: postImageUrl || null,
+      image_url: imageUrl,
       published: true,
     })
+
+    setPostSubmitting(false)
+    if (insertErr) {
+      setError(insertErr.message)
+      return
+    }
+
     setPostTitle('')
     setPostBody('')
     setPostDate('')
-    setPostImageUrl('')
+    clearPostImage()
     loadData()
   }
 
@@ -204,10 +253,11 @@ export default function AdminPage() {
                 <input
                   type="file"
                   accept="image/*"
+                  multiple
                   disabled={uploading}
                   onChange={(e) => {
-                    const f = e.target.files?.[0]
-                    if (f) uploadImage(f)
+                    const files = e.target.files
+                    if (files?.length) uploadImages(files)
                     e.target.value = ''
                   }}
                 />
@@ -215,9 +265,15 @@ export default function AdminPage() {
                   📷
                 </span>
                 <span className="admin-upload-title">
-                  {uploading ? 'Yuklanmoqda…' : 'Surat tanlang yoki tashlang'}
+                  {uploading
+                    ? uploadProgress
+                      ? `Yuklanmoqda… (${uploadProgress})`
+                      : 'Yuklanmoqda…'
+                    : 'Surat tanlang yoki tashlang'}
                 </span>
-                <span className="admin-upload-hint">PNG, JPG — Supabase gallery</span>
+                <span className="admin-upload-hint">
+                  Bir yoki bir nechta surat (PNG, JPG) — galereyada ko‘rinadi
+                </span>
               </label>
             </section>
 
@@ -272,10 +328,31 @@ export default function AdminPage() {
                     <input type="date" value={postDate} onChange={(e) => setPostDate(e.target.value)} />
                   </label>
                 )}
-                <label className="admin-field">
-                  <span>Surat havolasi (ixtiyoriy)</span>
-                  <input value={postImageUrl} onChange={(e) => setPostImageUrl(e.target.value)} />
-                </label>
+                <div className="admin-field">
+                  <span>Surat (ixtiyoriy)</span>
+                  <label className={`admin-upload admin-upload--compact ${postSubmitting ? 'is-uploading' : ''}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={postSubmitting}
+                      onChange={(e) => {
+                        onPostImageSelect(e.target.files?.[0])
+                        e.target.value = ''
+                      }}
+                    />
+                    <span className="admin-upload-title">
+                      {postImageFile ? postImageFile.name : 'Telefon yoki kompyuterdan surat tanlang'}
+                    </span>
+                  </label>
+                  {postImagePreview && (
+                    <div className="admin-image-preview">
+                      <img src={postImagePreview} alt="" />
+                      <button type="button" className="admin-btn-ghost admin-image-remove" onClick={clearPostImage}>
+                        Suratni olib tashlash
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <label className="admin-field">
                   <span>Matn</span>
                   <textarea
@@ -285,8 +362,8 @@ export default function AdminPage() {
                     required
                   />
                 </label>
-                <button type="submit" className="btn btn-primary admin-btn-full">
-                  Nashr qilish
+                <button type="submit" className="btn btn-primary admin-btn-full" disabled={postSubmitting}>
+                  {postSubmitting ? 'Yuklanmoqda…' : 'Nashr qilish'}
                 </button>
               </form>
             </section>
@@ -299,7 +376,10 @@ export default function AdminPage() {
                 <ul className="admin-post-list">
                   {posts.map((p) => (
                     <li key={p.id} className="admin-post-item">
-                      <div>
+                      {p.image_url && (
+                        <img src={p.image_url} alt="" className="admin-post-thumb" />
+                      )}
+                      <div className="admin-post-item-body">
                         <span className={`admin-badge admin-badge--${p.post_type}`}>
                           {p.post_type === 'event' ? 'Tadbir' : 'Yangilik'}
                         </span>

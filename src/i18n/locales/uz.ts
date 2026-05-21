@@ -40,6 +40,9 @@ const uz: Translations = {
       'Foto zonalar, bayram bezaklari va piknik tadbirlari. Ko‘proq surat va videolar Instagramda.',
     viewMore: 'Instagramda ko‘rish',
     loading: 'Yuklanmoqda…',
+    prev: 'Oldingi suratlar',
+    next: 'Keyingi suratlar',
+    slide: 'Slayd',
   },
   instagram: {
     title: 'Instagramdan',

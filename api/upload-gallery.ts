@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 type Req = {
   method?: string
   headers?: { authorization?: string }
-  body?: { fileName?: string; contentType?: string; data?: string }
+  body?: { fileName?: string; contentType?: string; data?: string; kind?: 'gallery' | 'post' }
 }
 
 type Res = {
@@ -41,8 +41,9 @@ export default async function handler(req: Req, res: Res) {
     return res.status(400).json({ error: 'Missing file data' })
   }
 
+  const kind = req.body?.kind === 'post' ? 'post' : 'gallery'
   const ext = fileName.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const path = `${Date.now()}.${ext}`
+  const path = kind === 'post' ? `posts/${Date.now()}.${ext}` : `${Date.now()}.${ext}`
   const buffer = Buffer.from(data, 'base64')
   const mime = contentType || `image/${ext === 'png' ? 'png' : 'jpeg'}`
 
@@ -60,18 +61,20 @@ export default async function handler(req: Req, res: Res) {
 
   const { data: urlData } = admin.storage.from('gallery').getPublicUrl(path)
 
-  const { count } = await admin.from('gallery_items').select('*', { count: 'exact', head: true })
-  const sortOrder = count ?? 0
+  if (kind === 'gallery') {
+    const { count } = await admin.from('gallery_items').select('*', { count: 'exact', head: true })
+    const sortOrder = count ?? 0
 
-  const { error: insertError } = await admin.from('gallery_items').insert({
-    image_url: urlData.publicUrl,
-    alt: 'Sevinc Picnic',
-    sort_order: sortOrder,
-  })
+    const { error: insertError } = await admin.from('gallery_items').insert({
+      image_url: urlData.publicUrl,
+      alt: 'Sevinc Picnic',
+      sort_order: sortOrder,
+    })
 
-  if (insertError) {
-    console.error('Gallery insert:', insertError.message)
-    return res.status(502).json({ error: insertError.message })
+    if (insertError) {
+      console.error('Gallery insert:', insertError.message)
+      return res.status(502).json({ error: insertError.message })
+    }
   }
 
   return res.status(200).json({ ok: true, image_url: urlData.publicUrl })

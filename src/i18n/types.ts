@@ -65,6 +65,9 @@ export type Translations = {
     subtitle: string
     viewMore: string
     loading: string
+    prev: string
+    next: string
+    slide: string
   }
   instagram: {
     title: string
