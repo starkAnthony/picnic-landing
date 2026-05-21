@@ -141,7 +141,17 @@ const ru: Translations = {
       'Фотозоны и аренда инвентаря',
     ],
     successTitle: 'Спасибо!',
-    successText: 'Мы получили заявку и скоро свяжемся с вами.',
+    successText: 'Заявка принята. Скоро свяжемся с вами в Telegram.',
+    submitting: 'Отправка…',
+    errorNotConfigured:
+      'Telegram-бот не настроен. Добавьте TELEGRAM_BOT_TOKEN и TELEGRAM_CHAT_ID на Vercel.',
+    errorNoApi:
+      'Работает только на опубликованном сайте, не в npm run dev. Откройте URL Vercel или npx vercel dev.',
+    errorChatNotFound:
+      'Сначала нажмите Start в вашем Telegram-боте, затем отправьте снова.',
+    errorBadToken: 'Неверный токен бота. Проверьте TELEGRAM_BOT_TOKEN на Vercel.',
+    errorFailed: 'Не удалось отправить. Попробуйте снова или позвоните нам.',
+    errorNetwork: 'Ошибка соединения. Попробуйте снова.',
     name: 'Имя',
     namePlaceholder: 'Ваше имя',
     email: 'Телефон или Telegram',
@@ -165,6 +175,7 @@ const ru: Translations = {
     explore: 'Разделы',
     connect: 'Контакты',
     phone: 'Телефон',
+    telegram: 'Telegram',
     instagram: 'Instagram',
     rights: 'Все права защищены.',
   },

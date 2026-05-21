@@ -140,7 +140,17 @@ const en: Translations = {
       'Photo zones and equipment rental',
     ],
     successTitle: 'Thank you!',
-    successText: 'We received your request and will be in touch soon.',
+    successText: 'Your request was received. We will contact you on Telegram soon.',
+    submitting: 'Sending…',
+    errorNotConfigured:
+      'Telegram bot is not set up. Add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID on Vercel.',
+    errorNoApi:
+      'This only works on the deployed site, not npm run dev. Open your Vercel URL or run npx vercel dev.',
+    errorChatNotFound:
+      'Press Start in your Telegram bot first, then try again.',
+    errorBadToken: 'Invalid bot token. Check TELEGRAM_BOT_TOKEN on Vercel.',
+    errorFailed: 'Could not send. Please try again or call us.',
+    errorNetwork: 'Connection error. Please try again.',
     name: 'Name',
     namePlaceholder: 'Your name',
     email: 'Phone or Telegram',
@@ -164,6 +174,7 @@ const en: Translations = {
     explore: 'Sections',
     connect: 'Connect',
     phone: 'Phone',
+    telegram: 'Telegram',
     instagram: 'Instagram',
     rights: 'All rights reserved.',
   },

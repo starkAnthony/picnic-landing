@@ -1,5 +1,12 @@
 import { useI18n } from '../i18n/context'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL, PHONE_DISPLAY, PHONE_TEL } from '../site'
+import {
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+  TELEGRAM_HANDLE,
+  TELEGRAM_URL,
+} from '../site'
 import './Footer.css'
 
 export default function Footer() {
@@ -27,6 +34,9 @@ export default function Footer() {
           <div>
             <h4>{t.footer.connect}</h4>
             <a href={`tel:${PHONE_TEL}`}>{t.footer.phone}: {PHONE_DISPLAY}</a>
+            <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">
+              {t.footer.telegram} {TELEGRAM_HANDLE}
+            </a>
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
               {t.footer.instagram} {INSTAGRAM_HANDLE}
             </a>

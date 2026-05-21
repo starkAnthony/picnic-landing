@@ -29,7 +29,7 @@ const uz: Translations = {
     statLocations: 'Asosiy xizmatlar',
     cardBadge: 'Asosiy xizmat',
     cardTitle: 'Bezakli foto zona',
-    cardPrice: 'Narx — kelishuv asosida',
+    cardPrice: 'Narxlar — kelishuv asosida',
     imageAlt: 'Sevinc Picnic — bezakli ochiq havoda foto zona',
   },
   gallery: {
@@ -141,7 +141,18 @@ const uz: Translations = {
       'Foto zona va piknik buyumlari ijarasi',
     ],
     successTitle: 'Rahmat!',
-    successText: 'So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.',
+    successText:
+      'So‘rovingiz qabul qilindi. Tez orada Telegram orqali bog‘lanamiz.',
+    submitting: 'Yuborilmoqda…',
+    errorNotConfigured:
+      'Telegram bot sozlanmagan. Vercel-da TELEGRAM_BOT_TOKEN va TELEGRAM_CHAT_ID qo‘ying.',
+    errorNoApi:
+      'Bu funksiya faqat internetdagi saytda ishlaydi (npm run dev emas). Vercel manzilini oching yoki npx vercel dev ishlating.',
+    errorChatNotFound:
+      'Telegram botda avval Start bosing (@BotFather botingiz), keyin qayta urinib ko‘ring.',
+    errorBadToken: 'Bot token noto‘g‘ri. Vercel-dagi TELEGRAM_BOT_TOKEN ni tekshiring.',
+    errorFailed: 'Yuborishda xatolik. Birozdan keyin qayta urinib ko‘ring yoki telefon orqali bog‘laning.',
+    errorNetwork: 'Internet yoki server bilan aloqa yo‘q. Qayta urinib ko‘ring.',
     name: 'Ism',
     namePlaceholder: 'Ismingiz',
     email: 'Telefon yoki Telegram',
@@ -165,6 +176,7 @@ const uz: Translations = {
     explore: 'Bo‘limlar',
     connect: 'Aloqa',
     phone: 'Telefon',
+    telegram: 'Telegram',
     instagram: 'Instagram',
     rights: 'Barcha huquqlar himoyalangan.',
   },

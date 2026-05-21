@@ -1,15 +1,54 @@
 import { useState, type FormEvent } from 'react'
 import { useI18n } from '../i18n/context'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL, PHONE_DISPLAY, PHONE_TEL } from '../site'
+import { buildBookingMessage } from '../lib/bookingMessage'
+import { sendBookingToTelegram, type TelegramSendResult } from '../lib/bookingTelegram'
+import {
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+  TELEGRAM_HANDLE,
+  TELEGRAM_URL,
+} from '../site'
 import './Booking.css'
 
 export default function Booking() {
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const { t } = useI18n()
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function errorMessage(result: TelegramSendResult): string {
+    if (result.ok) return ''
+    if (result.reason === 'not_configured') return t.booking.errorNotConfigured
+    if (result.reason === 'no_api') return t.booking.errorNoApi
+    if (result.reason === 'network') return t.booking.errorNetwork
+    if (result.reason === 'telegram') {
+      const d = result.description?.toLowerCase() ?? ''
+      if (d.includes('chat not found')) return t.booking.errorChatNotFound
+      if (d.includes('unauthorized')) return t.booking.errorBadToken
+      return `${t.booking.errorFailed} (${result.description})`
+    }
+    return t.booking.errorFailed
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSubmitted(true)
+    setSubmitting(true)
+    setError('')
+
+    const form = e.currentTarget
+    const message = buildBookingMessage(form, t)
+    const result = await sendBookingToTelegram(message)
+
+    if (result.ok) {
+      setSubmitted(true)
+      setSubmitting(false)
+      return
+    }
+
+    setError(errorMessage(result))
+    setSubmitting(false)
   }
 
   return (
@@ -22,6 +61,9 @@ export default function Booking() {
           <div className="booking-contacts">
             <a href={`tel:${PHONE_TEL}`} className="booking-contact">
               {PHONE_DISPLAY}
+            </a>
+            <a href={TELEGRAM_URL} className="booking-contact" target="_blank" rel="noopener noreferrer">
+              Telegram {TELEGRAM_HANDLE}
             </a>
             <a
               href={INSTAGRAM_URL}
@@ -94,8 +136,9 @@ export default function Booking() {
                   placeholder={t.booking.notesPlaceholder}
                 />
               </label>
-              <button type="submit" className="btn btn-primary">
-                {t.booking.submit}
+              {error && <p className="booking-error">{error}</p>}
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? t.booking.submitting : t.booking.submit}
               </button>
             </form>
           )}

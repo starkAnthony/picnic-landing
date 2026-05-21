@@ -43,6 +43,17 @@
   opacity: 1;
 }
 
+.booking-error {
+  color: #ffd4d4;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.booking-form button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
 .booking-perks {
   list-style: none;
   margin-top: 2rem;

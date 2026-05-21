@@ -93,6 +93,14 @@ export type Translations = {
     perks: string[]
     successTitle: string
     successText: string
+    submitting: string
+    submit: string
+    errorNotConfigured: string
+    errorNoApi: string
+    errorChatNotFound: string
+    errorBadToken: string
+    errorFailed: string
+    errorNetwork: string
     name: string
     namePlaceholder: string
     email: string
@@ -104,13 +112,13 @@ export type Translations = {
     guests: string
     notes: string
     notesPlaceholder: string
-    submit: string
   }
   footer: {
     tagline: string
     explore: string
     connect: string
     phone: string
+    telegram: string
     instagram: string
     rights: string
   }
