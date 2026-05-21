@@ -54,5 +54,26 @@ create policy "Auth update posts"
 create policy "Auth delete posts"
   on public.posts for delete to authenticated using (true);
 
--- Storage bucket: create "gallery" in Dashboard → Storage → New bucket → Public
--- Policy: public read, authenticated upload
+-- Storage bucket: Dashboard → Storage → New bucket → name: gallery → Public ✓
+-- Then run supabase/fix-storage-rls.sql (storage RLS is separate from table RLS)
+
+drop policy if exists "gallery public read" on storage.objects;
+drop policy if exists "gallery auth upload" on storage.objects;
+drop policy if exists "gallery auth update" on storage.objects;
+drop policy if exists "gallery auth delete" on storage.objects;
+
+create policy "gallery public read"
+  on storage.objects for select to public
+  using (bucket_id = 'gallery');
+
+create policy "gallery auth upload"
+  on storage.objects for insert to authenticated
+  with check (bucket_id = 'gallery');
+
+create policy "gallery auth update"
+  on storage.objects for update to authenticated
+  using (bucket_id = 'gallery') with check (bucket_id = 'gallery');
+
+create policy "gallery auth delete"
+  on storage.objects for delete to authenticated
+  using (bucket_id = 'gallery');

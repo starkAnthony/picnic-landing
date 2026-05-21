@@ -25,10 +25,34 @@ Without Supabase, the site still works with static images in `public/images/`.
 
 **SQL Editor** → paste `supabase/schema.sql` → **Run**.
 
-### Storage bucket
+### Storage bucket + upload (fixes “row-level security” error)
 
-1. **Storage** → **New bucket** → name: `gallery` → **Public bucket** ✓
-2. **Policies** → allow public read; authenticated users can upload (or use Storage policy wizard).
+**A) Bucket (bir marta)**
+
+1. **Storage** → **New bucket** → name exactly: **`gallery`** → **Public bucket** ✓ → Create
+
+**B) SQL (agar admin rasm yuklashda RLS xatosi chiqsa)**
+
+1. Supabase → **SQL Editor** → **New query**
+2. Loyihadagi `supabase/fix-storage-rls.sql` faylini oching → **butun matnni** nusxalang → SQL Editor ga yopishtiring → **Run**
+3. `/admin` da chiqib qayta **login** qiling, rasmni qayta yuklang
+
+**C) Vercel (tavsiya etiladi — server orqali yuklash)**
+
+1. Supabase → **Project Settings** → **API** → **`service_role`** key (maxfiy!)
+2. **Vercel** → Project → **Settings** → **Environment Variables**:
+
+| Key | Value |
+|-----|--------|
+| `SUPABASE_SERVICE_ROLE_KEY` | service_role key (anon emas!) |
+| `VITE_SUPABASE_URL` | loyiha URL |
+| `VITE_SUPABASE_ANON_KEY` | anon key |
+
+3. **Deployments** → oxirgi deploy → **Redeploy**
+
+A yoki B+C dan biri yetarli. Eng ishonchli: **B + C** birga.
+
+**Never** put `SUPABASE_SERVICE_ROLE_KEY` in `.env` with `VITE_` prefix or commit it to GitHub.
 
 ### Owner login
 

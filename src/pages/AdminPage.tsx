@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import { uploadGalleryImage } from '../lib/uploadGallery'
 import type { GalleryItem, Post } from '../types/content'
 import './AdminPage.css'
 
@@ -58,24 +59,14 @@ export default function AdminPage() {
   }
 
   async function uploadImage(file: File) {
-    if (!supabase) return
     setUploading(true)
     setError('')
-    const ext = file.name.split('.').pop() ?? 'jpg'
-    const path = `${Date.now()}.${ext}`
-    const { error: upErr } = await supabase.storage.from('gallery').upload(path, file)
-    if (upErr) {
-      setError(upErr.message)
-      setUploading(false)
+    const result = await uploadGalleryImage(file)
+    setUploading(false)
+    if (!result.ok) {
+      setError(result.error)
       return
     }
-    const { data } = supabase.storage.from('gallery').getPublicUrl(path)
-    await supabase.from('gallery_items').insert({
-      image_url: data.publicUrl,
-      alt: 'Sevinc Picnic',
-      sort_order: gallery.length,
-    })
-    setUploading(false)
     loadData()
   }
 
