@@ -1,0 +1,47 @@
+---
+description: Multi-language rules for the picnic landing page
+alwaysApply: true
+---
+
+# Internationalization (i18n)
+
+## Brand
+
+- Business name: **Sevinc Picnic**
+- Instagram: https://www.instagram.com/sevinc_picnic (handle `@sevinc_picnic`)
+- Tagline (RU bio): atmosphere for your celebration — reflect in copy, not generic US picnic template
+
+## Services (all locales must match)
+
+1. Decorated **photo zone** in picnic design
+2. **Event design & organization** — birthdays, marry-me proposals, outdoor parties and meetups
+3. **Picnic equipment rental**
+
+Pricing is **on request** — no fixed USD prices in copy.
+
+## Languages
+
+- **Default**: Uzbek (`uz`) — shown on first visit
+- **Additional**: Russian (`ru`), English (`en`)
+
+## Where strings live
+
+- All user-facing copy goes in `src/i18n/locales/{uz,ru,en}.ts`
+- Shared shape is defined in `src/i18n/types.ts` as `Translations`
+- Components use `useI18n()` from `src/i18n/context.tsx` — never hardcode UI strings in `.tsx` files
+
+## Adding or changing text
+
+1. Add the key to `Translations` in `types.ts`
+2. Add the string to **all three** locale files (`uz`, `ru`, `en`)
+3. Use `t.section.key` in the component
+
+## Locale switcher
+
+- `LanguageSwitcher` in the navbar; choice persists in `localStorage` under `picnic-locale`
+- `document.documentElement.lang` and page `<title>` / meta description update with the active locale
+
+## Do not
+
+- Introduce a fourth language without updating `Locale`, `locales`, `localeLabels`, and all locale files
+- Leave one locale file out of sync when adding keys

@@ -1,0 +1,173 @@
+import type { Translations } from '../types'
+
+const uz: Translations = {
+  brand: 'Sevinc Picnic',
+  meta: {
+    title: 'Sevinc Picnic — Bayramingiz uchun atmosfera',
+    description:
+      'Piknik dizaynida foto zona, ochiq havoda bayramlar uchun bezak va tashkillashtirish, piknik buyumlarini ijaraga berish.',
+  },
+  nav: {
+    packages: 'Xizmatlar',
+    gallery: 'Galereya',
+    howItWorks: 'Qanday ishlaydi',
+    reviews: 'Sharhlar',
+    book: 'Bron',
+    reserve: 'Bog‘lanish',
+    openMenu: 'Menyuni ochish',
+    closeMenu: 'Menyuni yopish',
+  },
+  hero: {
+    eyebrow: 'Bayramingiz uchun atmosfera',
+    title: 'Ochiq havoda',
+    titleEmphasis: ' sehrli bayramlar',
+    text: 'Piknik uslubida bezakli foto zona, tug‘ilgan kun va takliflar uchun shaxsiy dizayn hamda piknik buyumlarini ijaraga beramiz. Siz g‘oyangizni ayting — biz manzarani yaratamiz.',
+    bookCta: 'Buyurtma berish',
+    packagesCta: 'Xizmatlarni ko‘rish',
+    statGuests: 'Instagram postlar',
+    statRating: 'Obunachilar',
+    statLocations: 'Asosiy xizmatlar',
+    cardBadge: 'Asosiy xizmat',
+    cardTitle: 'Bezakli foto zona',
+    cardPrice: 'Narx — kelishuv asosida',
+    imageAlt: 'Sevinc Picnic — bezakli ochiq havoda foto zona',
+  },
+  gallery: {
+    label: 'Galereya',
+    title: 'Bizning ishlarimiz',
+    subtitle:
+      'Foto zonalar, bayram bezaklari va piknik tadbirlari. Ko‘proq surat va videolar Instagramda.',
+    viewMore: 'Instagramda ko‘rish',
+  },
+  packages: {
+    label: 'Xizmatlar',
+    title: 'Biz nima taklif qilamiz',
+    subtitle:
+      'Sevinc Picnic — ochiq havoda uchrashuvlar, bayramlar va maxsus lahzalar uchun bezak, tashkillashtirish va ijaraga berish.',
+    popularBadge: 'Eng ko‘p buyurtma',
+    priceOnRequest: 'Narx — kelishuv asosida',
+    select: 'Buyurtma berish',
+    items: [
+      {
+        name: 'Bezakli foto zona',
+        description:
+          'Piknik dizaynida surat va video uchun tayyorlangan foto zona — adyolalar, gullar, shamollar va sizning mavzuingizga mos bezak.',
+        features: [
+          'Piknik uslubida to‘liq bezak',
+          'Surat/video uchun tayyor muhit',
+          'Mavzu va ranglar bo‘yicha moslashtirish',
+          'Joylashtirish va yig‘ish',
+        ],
+        popular: true,
+      },
+      {
+        name: 'Tadbir dizayni va tashkillashtirish',
+        description:
+          'Tug‘ilgan kun, «Menga turmush qur», uchrashuvlar va boshqa ochiq havoda bayramlar uchun shaxsiy g‘oya, bezak va tashkil etish.',
+        features: [
+          'Tug‘ilgan kun va yubiley',
+          'Taklif (marry me) va romantik tadbirlar',
+          'Uchrashuvlar va oilaviy bayramlar',
+          'Shaxsiy dizayn va dekor',
+        ],
+      },
+      {
+        name: 'Piknik buyumlarini ijaraga berish',
+        description:
+          'O‘z tadbiringiz uchun piknik stoli, adyolalar, idish-tovoq, shamdonlar va boshqa aksessuarlarni ijaraga oling.',
+        features: [
+          'Adyollar va yostiqchalar',
+          'Stol va piknik idishlari',
+          'Shamdon va dekor elementlari',
+          'Muddat va miqdor bo‘yicha moslash',
+        ],
+      },
+    ],
+  },
+  howItWorks: {
+    label: 'Qanday ishlaydi',
+    title: 'G‘oyadan tayyor bayramgacha',
+    subtitle:
+      'Instagram sahifamizdagi ishlarimizdan ilhom oling — har bir loyiha sizning tadbiringiz uchun alohida yaratiladi.',
+    steps: [
+      {
+        title: 'Biz bilan bog‘laning',
+        text: 'Tadbir turi, sana, mehmonlar soni va istaklaringizni yozing. Instagram orqali ham murojaat qilishingiz mumkin.',
+      },
+      {
+        title: 'Dizayn va tayyorgarlik',
+        text: 'Bezak, foto zona yoki to‘liq tadbir konsepsiyasini tayyorlaymiz. Kerak bo‘lsa, ijaraga buyumlar tanlanadi.',
+      },
+      {
+        title: 'Bayram va yig‘ish',
+        text: 'Joyda hammasi tayyor. Siz zavqlanasiz — o‘rnatish va yig‘ishni biz bajaramiz (ijara bo‘yicha qaytarish ham shu jumladan).',
+      },
+    ],
+  },
+  testimonials: {
+    label: 'Sharhlar',
+    title: 'Mijozlarimiz nima deydi',
+    starsLabel: '5 dan 5 yulduz',
+    items: [
+      {
+        quote:
+          'Tug‘ilgan kun uchun foto zona buyurtma qildik — bezak ajoyib edi, suratlar Instagramga mos keldi. Hammaga yoqdi!',
+        name: 'Dilnoza K.',
+        occasion: 'Tug‘ilgan kun',
+      },
+      {
+        quote:
+          '«Menga turmush qur» uchun tashkillashtirishdi. Har narsa vaqtida, romantik va juda chiroyli bo‘ldi. Rahmat, Sevinc!',
+        name: 'Kamola va Sardor',
+        occasion: 'Taklif',
+      },
+      {
+        quote:
+          'Piknik stoli va adyolalarni ijaraga oldik — o‘zimiz ham tez bezadik. Sifat yaxshi, qaytarish oson bo‘ldi.',
+        name: 'Nilufar A.',
+        occasion: 'Ijara',
+      },
+    ],
+  },
+  booking: {
+    label: 'Buyurtma',
+    title: 'Tadbiringizni rejalashtiramizmi?',
+    subtitle:
+      'Quyidagi formani to‘ldiring yoki Instagramda yozing — tez orada javob beramiz va narxni kelishamiz.',
+    viewInstagram: 'Ishlarimizni Instagramda ko‘ring',
+    perks: [
+      'Har bir tadbir uchun alohida dizayn',
+      'Tug‘ilgan kun, taklif, uchrashuv va boshqa bayramlar',
+      'Foto zona va piknik buyumlari ijarasi',
+    ],
+    successTitle: 'Rahmat!',
+    successText: 'So‘rovingiz qabul qilindi. Tez orada bog‘lanamiz.',
+    name: 'Ism',
+    namePlaceholder: 'Ismingiz',
+    email: 'Telefon yoki Telegram',
+    emailPlaceholder: '+998 99 442 60 30',
+    package: 'Xizmat',
+    packagePlaceholder: 'Xizmatni tanlang',
+    packageOptions: [
+      { value: 'photo-zone', label: 'Bezakli foto zona' },
+      { value: 'event-design', label: 'Tadbir dizayni va tashkillashtirish' },
+      { value: 'rental', label: 'Piknik buyumlarini ijaraga berish' },
+      { value: 'combo', label: 'Bir nechta xizmat (kombinatsiya)' },
+    ],
+    date: 'Tadbir sanasi',
+    guests: 'Mehmonlar soni',
+    notes: 'Qo‘shimcha ma’lumot',
+    notesPlaceholder: 'Tadbir turi, mavzu, joy, maxsus istaklar...',
+    submit: 'So‘rov yuborish',
+  },
+  footer: {
+    tagline: 'Bayramingiz uchun atmosfera — piknik dizayni, foto zona va ochiq havoda tadbirlar.',
+    explore: 'Bo‘limlar',
+    connect: 'Aloqa',
+    phone: 'Telefon',
+    instagram: 'Instagram',
+    rights: 'Barcha huquqlar himoyalangan.',
+  },
+}
+
+export default uz

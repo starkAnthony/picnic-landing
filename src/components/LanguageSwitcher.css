@@ -1,0 +1,34 @@
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  background: rgba(92, 122, 94, 0.08);
+  border-radius: 999px;
+}
+
+.lang-switcher button {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-radius: 999px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lang-switcher button:hover {
+  color: var(--sage-dark);
+}
+
+.lang-switcher button.active {
+  background: var(--cream);
+  color: var(--sage-dark);
+  box-shadow: 0 1px 4px rgba(45, 52, 48, 0.1);
+}
+
+@media (max-width: 768px) {
+  .nav-lang {
+    margin-top: 0.5rem;
+  }
+}
