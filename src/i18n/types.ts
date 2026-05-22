@@ -118,6 +118,7 @@ export type Translations = {
     errorNotConfigured: string
     errorNoApi: string
     errorChatNotFound: string
+    errorGroupUpgraded: string
     errorBadToken: string
     errorFailed: string
     errorNetwork: string

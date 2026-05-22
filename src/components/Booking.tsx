@@ -7,14 +7,7 @@ import { useServices } from '../hooks/useServices'
 import { useI18n } from '../i18n/context'
 import { buildBookingMessage } from '../lib/bookingMessage'
 import { sendBookingToTelegram, type TelegramSendResult } from '../lib/bookingTelegram'
-import {
-  INSTAGRAM_HANDLE,
-  INSTAGRAM_URL,
-  PHONE_DISPLAY,
-  PHONE_TEL,
-  TELEGRAM_HANDLE,
-  TELEGRAM_URL,
-} from '../site'
+import { useSiteSettings } from '../context/SiteSettingsContext'
 import './Booking.css'
 
 export default function Booking() {
@@ -23,6 +16,7 @@ export default function Booking() {
   const [error, setError] = useState('')
   const [selectedService, setSelectedService] = useState('')
   const { t } = useI18n()
+  const site = useSiteSettings()
   const { services, fromCms } = useServices()
 
   const packageOptions = fromCms
@@ -52,6 +46,7 @@ export default function Booking() {
     if (result.reason === 'telegram') {
       const d = result.description?.toLowerCase() ?? ''
       if (d.includes('chat not found')) return t.booking.errorChatNotFound
+      if (d.includes('upgraded to a supergroup')) return t.booking.errorGroupUpgraded
       if (d.includes('unauthorized')) return t.booking.errorBadToken
       return `${t.booking.errorFailed} (${result.description})`
     }
@@ -85,19 +80,19 @@ export default function Booking() {
           <h2 className="section-title">{t.booking.title}</h2>
           <p className="section-subtitle">{t.booking.subtitle}</p>
           <div className="booking-contacts">
-            <a href={`tel:${PHONE_TEL}`} className="booking-contact">
-              {PHONE_DISPLAY}
+            <a href={`tel:${site.phoneTel}`} className="booking-contact">
+              {site.phoneDisplay}
             </a>
-            <a href={TELEGRAM_URL} className="booking-contact" target="_blank" rel="noopener noreferrer">
-              Telegram {TELEGRAM_HANDLE}
+            <a href={site.telegramUrl} className="booking-contact" target="_blank" rel="noopener noreferrer">
+              Telegram {site.telegramHandle}
             </a>
             <a
-              href={INSTAGRAM_URL}
+              href={site.instagramUrl}
               className="booking-contact"
               target="_blank"
               rel="noopener noreferrer"
             >
-              {t.booking.viewInstagram} — {INSTAGRAM_HANDLE}
+              {t.booking.viewInstagram} — {site.instagramHandle}
             </a>
           </div>
           <ul className="booking-perks">

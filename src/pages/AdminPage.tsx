@@ -1,6 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
+import {
+  DEFAULT_INSTAGRAM_HANDLE,
+  DEFAULT_PHONE_DISPLAY,
+  DEFAULT_TELEGRAM_USERNAME,
+  normalizeUsername,
+} from '../site'
 import { uploadGalleryImage, uploadPostImage } from '../lib/uploadImage'
 import type { GalleryItem, Post, Service } from '../types/content'
 import './AdminPage.css'
@@ -10,7 +16,7 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<'gallery' | 'posts' | 'services'>('gallery')
+  const [tab, setTab] = useState<'settings' | 'services' | 'gallery' | 'posts'>('settings')
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [posts, setPosts] = useState<Post[]>([])
   const [services, setServices] = useState<Service[]>([])
@@ -30,6 +36,11 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState('')
   const [postSubmitting, setPostSubmitting] = useState(false)
+  const [phoneDisplay, setPhoneDisplay] = useState(DEFAULT_PHONE_DISPLAY)
+  const [telegramUsername, setTelegramUsername] = useState(DEFAULT_TELEGRAM_USERNAME)
+  const [instagramHandle, setInstagramHandle] = useState(DEFAULT_INSTAGRAM_HANDLE)
+  const [instagramUrl, setInstagramUrl] = useState('')
+  const [settingsSaving, setSettingsSaving] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -49,14 +60,43 @@ export default function AdminPage() {
 
   async function loadData() {
     if (!supabase) return
-    const [g, p, s] = await Promise.all([
+    const [g, p, s, settings] = await Promise.all([
       supabase.from('gallery_items').select('*').order('sort_order'),
       supabase.from('posts').select('*').order('created_at', { ascending: false }),
       supabase.from('services').select('*').order('sort_order'),
+      supabase.from('site_settings').select('*').eq('id', 1).maybeSingle(),
     ])
     if (g.data) setGallery(g.data as GalleryItem[])
     if (p.data) setPosts(p.data as Post[])
     if (s.data) setServices(s.data as Service[])
+    if (settings.data) {
+      setPhoneDisplay(settings.data.phone_display ?? DEFAULT_PHONE_DISPLAY)
+      setTelegramUsername(normalizeUsername(settings.data.telegram_username ?? DEFAULT_TELEGRAM_USERNAME))
+      setInstagramHandle(normalizeUsername(settings.data.instagram_handle ?? DEFAULT_INSTAGRAM_HANDLE))
+      setInstagramUrl(settings.data.instagram_url ?? '')
+    }
+  }
+
+  async function saveSettings(e: FormEvent) {
+    e.preventDefault()
+    if (!supabase) return
+    setError('')
+    setSettingsSaving(true)
+
+    const { error: err } = await supabase.from('site_settings').upsert({
+      id: 1,
+      phone_display: phoneDisplay.trim(),
+      telegram_username: normalizeUsername(telegramUsername),
+      instagram_handle: normalizeUsername(instagramHandle),
+      instagram_url: instagramUrl.trim() || null,
+      updated_at: new Date().toISOString(),
+    })
+
+    setSettingsSaving(false)
+    if (err) {
+      setError(err.message)
+      return
+    }
   }
 
   function parseFeatures(text: string): string[] {
@@ -288,6 +328,13 @@ export default function AdminPage() {
           <nav className="admin-tabs" aria-label="Admin sections">
             <button
               type="button"
+              className={tab === 'settings' ? 'active' : ''}
+              onClick={() => setTab('settings')}
+            >
+              Sozlamalar
+            </button>
+            <button
+              type="button"
               className={tab === 'services' ? 'active' : ''}
               onClick={() => setTab('services')}
             >
@@ -321,6 +368,61 @@ export default function AdminPage() {
 
       <main className="admin-main">
         {error && <p className="admin-alert admin-alert--bar">{error}</p>}
+
+        {tab === 'settings' && (
+          <section className="admin-card admin-card--narrow admin-settings">
+            <h2>Sayt sozlamalari</h2>
+            <p className="admin-muted">
+              Telefon, Telegram va Instagram — bosh sahifa, footer va buyurtma bo‘limida ko‘rinadi.
+              <br />
+              <strong>Eslatma:</strong> Buyurtmalarni qabul qilish (bot token va guruh id) hali Vercel
+              Environment Variables da — bu yerda faqat mijozlarga ko‘rinadigan kontaktlar.
+            </p>
+            <form onSubmit={saveSettings} className="admin-form">
+              <label className="admin-field">
+                <span>Telefon (ko‘rinishi)</span>
+                <input
+                  value={phoneDisplay}
+                  onChange={(e) => setPhoneDisplay(e.target.value)}
+                  placeholder="+998 99 442 60 30"
+                  required
+                />
+              </label>
+              <label className="admin-field">
+                <span>Telegram username</span>
+                <input
+                  value={telegramUsername}
+                  onChange={(e) => setTelegramUsername(e.target.value)}
+                  placeholder="tony_not"
+                  required
+                />
+                <span className="admin-hint">@ siz qo‘ymang — faqat username</span>
+              </label>
+              <label className="admin-field">
+                <span>Instagram username</span>
+                <input
+                  value={instagramHandle}
+                  onChange={(e) => setInstagramHandle(e.target.value)}
+                  placeholder="sevinc_picnic"
+                  required
+                />
+              </label>
+              <label className="admin-field">
+                <span>Instagram havolasi (ixtiyoriy)</span>
+                <input
+                  type="url"
+                  value={instagramUrl}
+                  onChange={(e) => setInstagramUrl(e.target.value)}
+                  placeholder="https://www.instagram.com/..."
+                />
+                <span className="admin-hint">Bo‘sh qoldirsangiz, username dan link yasaladi</span>
+              </label>
+              <button type="submit" className="btn btn-primary admin-btn-full" disabled={settingsSaving}>
+                {settingsSaving ? 'Saqlanmoqda…' : 'Saqlash'}
+              </button>
+            </form>
+          </section>
+        )}
 
         {tab === 'services' && (
           <div className="admin-layout admin-layout--split">

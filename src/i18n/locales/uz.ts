@@ -170,6 +170,8 @@ const uz: Translations = {
       'Bu funksiya faqat internetdagi saytda ishlaydi (npm run dev emas). Vercel manzilini oching yoki npx vercel dev ishlating.',
     errorChatNotFound:
       'TELEGRAM_CHAT_ID noto‘g‘ri. Guruh uchun: botni guruhga qo‘shing, guruhda xabar yozing, getUpdates dan -100... id oling. Shaxsiy chat uchun: botda Start bosing. Vercel-da yangilab Redeploy qiling.',
+    errorGroupUpgraded:
+      'Telegram guruh “supergroup” ga o‘zgardi — eski chat id ishlamaydi. Guruhda xabar yozing, getUpdates dan yangi -100... id ni Vercel TELEGRAM_CHAT_ID ga qo‘ying va Redeploy qiling.',
     errorBadToken: 'Bot token noto‘g‘ri. Vercel-dagi TELEGRAM_BOT_TOKEN ni tekshiring.',
     errorFailed: 'Yuborishda xatolik. Birozdan keyin qayta urinib ko‘ring yoki telefon orqali bog‘laning.',
     errorNetwork: 'Internet yoki server bilan aloqa yo‘q. Qayta urinib ko‘ring.',

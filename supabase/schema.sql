@@ -35,9 +35,23 @@ create table if not exists public.posts (
   created_at timestamptz default now()
 );
 
+-- Contact links (phone, Telegram, Instagram) — editable in /admin
+create table if not exists public.site_settings (
+  id int primary key default 1,
+  phone_display text not null default '+998 99 442 60 30',
+  telegram_username text not null default 'tony_not',
+  instagram_handle text not null default 'sevinc_picnic',
+  instagram_url text,
+  updated_at timestamptz default now(),
+  constraint site_settings_single_row check (id = 1)
+);
+
+insert into public.site_settings (id) values (1) on conflict (id) do nothing;
+
 alter table public.gallery_items enable row level security;
 alter table public.services enable row level security;
 alter table public.posts enable row level security;
+alter table public.site_settings enable row level security;
 
 -- Everyone can read published content
 create policy "Public read gallery"
@@ -55,6 +69,11 @@ create policy "Public read published services"
   to anon, authenticated
   using (published = true);
 
+create policy "Public read site settings"
+  on public.site_settings for select
+  to anon, authenticated
+  using (true);
+
 -- Only logged-in owner can manage
 create policy "Auth insert gallery"
   on public.gallery_items for insert to authenticated with check (true);
@@ -64,6 +83,12 @@ create policy "Auth update gallery"
 
 create policy "Auth delete gallery"
   on public.gallery_items for delete to authenticated using (true);
+
+create policy "Auth insert site settings"
+  on public.site_settings for insert to authenticated with check (true);
+
+create policy "Auth update site settings"
+  on public.site_settings for update to authenticated using (true);
 
 create policy "Auth insert services"
   on public.services for insert to authenticated with check (true);

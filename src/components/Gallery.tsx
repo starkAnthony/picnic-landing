@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useGallery } from '../hooks/useGallery'
 import { useI18n } from '../i18n/context'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../site'
+import { useSiteSettings } from '../context/SiteSettingsContext'
 import './Gallery.css'
 
 const PER_PAGE = 4
 
 export default function Gallery() {
   const { t } = useI18n()
+  const site = useSiteSettings()
   const { items, loading } = useGallery()
   const [page, setPage] = useState(0)
 
@@ -47,7 +48,7 @@ export default function Gallery() {
               {visible.map((image) => (
                 <a
                   key={image.id}
-                  href={INSTAGRAM_URL}
+                  href={site.instagramUrl}
                   className="gallery-item"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -87,8 +88,8 @@ export default function Gallery() {
           </div>
         )}
 
-        <a href={INSTAGRAM_URL} className="btn btn-outline gallery-cta" target="_blank" rel="noopener noreferrer">
-          {t.gallery.viewMore} — {INSTAGRAM_HANDLE}
+        <a href={site.instagramUrl} className="btn btn-outline gallery-cta" target="_blank" rel="noopener noreferrer">
+          {t.gallery.viewMore} — {site.instagramHandle}
         </a>
       </div>
     </section>

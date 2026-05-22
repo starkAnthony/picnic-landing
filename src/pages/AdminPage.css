@@ -296,6 +296,16 @@
   gap: 0.5rem;
 }
 
+.admin-settings {
+  max-width: 520px;
+}
+
+.admin-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .admin-service-list {
   list-style: none;
   display: flex;

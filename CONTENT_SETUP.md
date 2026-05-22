@@ -25,7 +25,10 @@ Without Supabase, the site still works with static images in `public/images/`.
 
 **SQL Editor** → paste `supabase/schema.sql` → **Run**.
 
-Agar loyiha allaqachon yaratilgan bo‘lsa, qo‘shimcha jadval uchun **`supabase/services.sql`** ni ham ishga tushiring (xizmat kartochkalari va narxlar).
+Agar loyiha allaqachon yaratilgan bo‘lsa, qo‘shimcha jadvallar uchun SQL ni ham ishga tushiring:
+
+- **`supabase/services.sql`** — xizmat kartochkalari va narxlar
+- **`supabase/site-settings.sql`** — telefon, Telegram, Instagram (admin **Sozlamalar**)
 
 ### Storage bucket + upload (fixes “row-level security” error)
 
@@ -113,6 +116,7 @@ The site section **“Instagramdan”** will show latest posts automatically. Un
 
 URL: **`/admin`**
 
+- **Sozlamalar** — telefon, Telegram username, Instagram (sayt bo‘ylab kontaktlar)
 - **Xizmatlar** — xizmat nomi, tavsif, narx (matn), imkoniyatlar ro‘yxati, “eng ko‘p buyurtma” belgisi
 - **Gallery** — upload images (stored in Supabase)
 - **News & events** — title, text, surat yuklash, event date

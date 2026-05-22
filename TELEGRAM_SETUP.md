@@ -43,6 +43,10 @@ Visitors stay on the site. Messages arrive in **your Telegram app** from your bo
 
 **“Start” in the bot is only for private chat (Option A).** For groups you do not press Start — you only need the correct **group** `chat.id`.
 
+### Group upgraded to supergroup?
+
+If the site shows `group chat was upgraded to a supergroup chat`, Telegram changed the group id (e.g. from `-5191230976` to `-100...`). Send a new message in **Picnic** group, open `getUpdates` again, copy the new `"chat":{"id":-100...}`, update Vercel, and **Redeploy**.
+
 ## 3. Add secrets on Vercel
 
 Project → **Settings** → **Environment Variables**:

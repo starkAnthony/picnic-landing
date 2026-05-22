@@ -169,6 +169,8 @@ const ru: Translations = {
       'Работает только на опубликованном сайте, не в npm run dev. Откройте URL Vercel или npx vercel dev.',
     errorChatNotFound:
       'Неверный TELEGRAM_CHAT_ID. Для группы: добавьте бота, напишите в группе, возьмите id -100... из getUpdates. Для личного чата: Start в боте. Обновите Vercel и Redeploy.',
+    errorGroupUpgraded:
+      'Группа стала supergroup — старый chat id не работает. Напишите в группе, возьмите новый -100... id из getUpdates, обновите Vercel и Redeploy.',
     errorBadToken: 'Неверный токен бота. Проверьте TELEGRAM_BOT_TOKEN на Vercel.',
     errorFailed: 'Не удалось отправить. Попробуйте снова или позвоните нам.',
     errorNetwork: 'Ошибка соединения. Попробуйте снова.',

@@ -1,16 +1,10 @@
+import { useSiteSettings } from '../context/SiteSettingsContext'
 import { useI18n } from '../i18n/context'
-import {
-  INSTAGRAM_HANDLE,
-  INSTAGRAM_URL,
-  PHONE_DISPLAY,
-  PHONE_TEL,
-  TELEGRAM_HANDLE,
-  TELEGRAM_URL,
-} from '../site'
 import './Footer.css'
 
 export default function Footer() {
   const { t } = useI18n()
+  const site = useSiteSettings()
 
   return (
     <footer className="footer">
@@ -34,12 +28,12 @@ export default function Footer() {
           </div>
           <div>
             <h4>{t.footer.connect}</h4>
-            <a href={`tel:${PHONE_TEL}`}>{t.footer.phone}: {PHONE_DISPLAY}</a>
-            <a href={TELEGRAM_URL} target="_blank" rel="noopener noreferrer">
-              {t.footer.telegram} {TELEGRAM_HANDLE}
+            <a href={`tel:${site.phoneTel}`}>{t.footer.phone}: {site.phoneDisplay}</a>
+            <a href={site.telegramUrl} target="_blank" rel="noopener noreferrer">
+              {t.footer.telegram} {site.telegramHandle}
             </a>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-              {t.footer.instagram} {INSTAGRAM_HANDLE}
+            <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer">
+              {t.footer.instagram} {site.instagramHandle}
             </a>
           </div>
         </div>

@@ -1,10 +1,11 @@
 import { useInstagramFeed } from '../hooks/useInstagramFeed'
 import { useI18n } from '../i18n/context'
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../site'
+import { useSiteSettings } from '../context/SiteSettingsContext'
 import './InstagramFeed.css'
 
 export default function InstagramFeed() {
   const { t } = useI18n()
+  const site = useSiteSettings()
   const { items, loading, configured } = useInstagramFeed()
 
   return (
@@ -40,14 +41,14 @@ export default function InstagramFeed() {
         {!loading && !configured && (
           <p className="instagram-fallback">
             {t.instagram.notConnected}{' '}
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-              {INSTAGRAM_HANDLE}
+            <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer">
+              {site.instagramHandle}
             </a>
           </p>
         )}
 
-        <a href={INSTAGRAM_URL} className="btn btn-outline instagram-cta" target="_blank" rel="noopener noreferrer">
-          {t.instagram.viewMore} — {INSTAGRAM_HANDLE}
+        <a href={site.instagramUrl} className="btn btn-outline instagram-cta" target="_blank" rel="noopener noreferrer">
+          {t.instagram.viewMore} — {site.instagramHandle}
         </a>
       </div>
     </section>

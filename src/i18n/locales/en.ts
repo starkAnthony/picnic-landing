@@ -168,6 +168,8 @@ const en: Translations = {
       'This only works on the deployed site, not npm run dev. Open your Vercel URL or run npx vercel dev.',
     errorChatNotFound:
       'Wrong TELEGRAM_CHAT_ID. For a group: add the bot, send a message in the group, copy the -100... id from getUpdates. For DM: press Start in the bot. Update Vercel and Redeploy.',
+    errorGroupUpgraded:
+      'Your Telegram group became a supergroup — the old chat id no longer works. Send a message in the group, copy the new -100... id from getUpdates into Vercel TELEGRAM_CHAT_ID, then Redeploy.',
     errorBadToken: 'Invalid bot token. Check TELEGRAM_BOT_TOKEN on Vercel.',
     errorFailed: 'Could not send. Please try again or call us.',
     errorNetwork: 'Connection error. Please try again.',
