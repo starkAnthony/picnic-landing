@@ -108,6 +108,8 @@
 .package-card .btn {
   width: 100%;
   margin-top: auto;
+  font: inherit;
+  cursor: pointer;
 }
 
 @media (max-width: 900px) {

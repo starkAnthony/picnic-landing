@@ -1,5 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { BOOKING_SERVICE_KEY } from './Packages'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import {
+  BOOKING_SERVICE_EVENT,
+  readPendingBookingService,
+} from '../lib/bookingSelection'
 import { useServices } from '../hooks/useServices'
 import { useI18n } from '../i18n/context'
 import { buildBookingMessage } from '../lib/bookingMessage'
@@ -29,17 +32,17 @@ export default function Booking() {
       }))
     : t.booking.packageOptions
 
-  useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem(BOOKING_SERVICE_KEY)
-      if (saved && packageOptions.some((o) => o.value === saved)) {
-        setSelectedService(saved)
-        sessionStorage.removeItem(BOOKING_SERVICE_KEY)
-      }
-    } catch {
-      /* ignore */
-    }
+  const applyPendingService = useCallback(() => {
+    const ids = packageOptions.map((o) => o.value)
+    const saved = readPendingBookingService(ids)
+    if (saved) setSelectedService(saved)
   }, [packageOptions])
+
+  useEffect(() => {
+    applyPendingService()
+    window.addEventListener(BOOKING_SERVICE_EVENT, applyPendingService)
+    return () => window.removeEventListener(BOOKING_SERVICE_EVENT, applyPendingService)
+  }, [applyPendingService])
 
   function errorMessage(result: TelegramSendResult): string {
     if (result.ok) return ''

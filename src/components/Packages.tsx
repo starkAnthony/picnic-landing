@@ -1,19 +1,15 @@
 import { useServices } from '../hooks/useServices'
 import { useI18n } from '../i18n/context'
+import { scrollToBooking, setBookingService } from '../lib/bookingSelection'
 import './Packages.css'
-
-const BOOKING_SERVICE_KEY = 'booking-service'
 
 export default function Packages() {
   const { t } = useI18n()
   const { services, loading } = useServices()
 
-  function selectForBooking(serviceId: string) {
-    try {
-      sessionStorage.setItem(BOOKING_SERVICE_KEY, serviceId)
-    } catch {
-      /* ignore */
-    }
+  function requestService(serviceId: string) {
+    setBookingService(serviceId)
+    scrollToBooking()
   }
 
   return (
@@ -45,13 +41,13 @@ export default function Packages() {
                     <li key={f}>{f}</li>
                   ))}
                 </ul>
-                <a
-                  href="#book"
+                <button
+                  type="button"
                   className={`btn ${pkg.is_popular ? 'btn-primary' : 'btn-outline'}`}
-                  onClick={() => selectForBooking(pkg.id)}
+                  onClick={() => requestService(pkg.id)}
                 >
                   {t.packages.select}
-                </a>
+                </button>
               </article>
             ))}
           </div>
@@ -60,5 +56,3 @@ export default function Packages() {
     </section>
   )
 }
-
-export { BOOKING_SERVICE_KEY }
