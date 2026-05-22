@@ -66,6 +66,7 @@ const uz: Translations = {
     popularBadge: 'Eng ko‘p buyurtma',
     priceOnRequest: 'Narx — kelishuv asosida',
     select: 'Buyurtma berish',
+    loading: 'Yuklanmoqda…',
     items: [
       {
         name: 'Bezakli foto zona',

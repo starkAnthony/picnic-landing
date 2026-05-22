@@ -90,6 +90,7 @@ export type Translations = {
     popularBadge: string
     priceOnRequest: string
     select: string
+    loading: string
     items: PackageItem[]
   }
   howItWorks: {

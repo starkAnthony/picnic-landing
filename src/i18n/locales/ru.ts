@@ -66,6 +66,7 @@ const ru: Translations = {
     popularBadge: 'Чаще всего заказывают',
     priceOnRequest: 'Цена по запросу',
     select: 'Заказать услугу',
+    loading: 'Загрузка…',
     items: [
       {
         name: 'Оформленная фотозона',

@@ -1,4 +1,6 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
+import { BOOKING_SERVICE_KEY } from './Packages'
+import { useServices } from '../hooks/useServices'
 import { useI18n } from '../i18n/context'
 import { buildBookingMessage } from '../lib/bookingMessage'
 import { sendBookingToTelegram, type TelegramSendResult } from '../lib/bookingTelegram'
@@ -16,7 +18,28 @@ export default function Booking() {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [selectedService, setSelectedService] = useState('')
   const { t } = useI18n()
+  const { services, fromCms } = useServices()
+
+  const packageOptions = fromCms
+    ? services.map((s) => ({
+        value: s.id,
+        label: s.price_text ? `${s.name} — ${s.price_text}` : s.name,
+      }))
+    : t.booking.packageOptions
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(BOOKING_SERVICE_KEY)
+      if (saved && packageOptions.some((o) => o.value === saved)) {
+        setSelectedService(saved)
+        sessionStorage.removeItem(BOOKING_SERVICE_KEY)
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [packageOptions])
 
   function errorMessage(result: TelegramSendResult): string {
     if (result.ok) return ''
@@ -107,11 +130,16 @@ export default function Booking() {
               </div>
               <label>
                 {t.booking.package}
-                <select name="package" required defaultValue="">
+                <select
+                  name="package"
+                  required
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                >
                   <option value="" disabled>
                     {t.booking.packagePlaceholder}
                   </option>
-                  {t.booking.packageOptions.map((opt) => (
+                  {packageOptions.map((opt) => (
                     <option key={opt.value} value={opt.value}>
                       {opt.label}
                     </option>

@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { uploadGalleryImage, uploadPostImage } from '../lib/uploadImage'
-import type { GalleryItem, Post } from '../types/content'
+import type { GalleryItem, Post, Service } from '../types/content'
 import './AdminPage.css'
 
 export default function AdminPage() {
@@ -10,9 +10,17 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<'gallery' | 'posts'>('gallery')
+  const [tab, setTab] = useState<'gallery' | 'posts' | 'services'>('gallery')
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [posts, setPosts] = useState<Post[]>([])
+  const [services, setServices] = useState<Service[]>([])
+  const [svcName, setSvcName] = useState('')
+  const [svcDesc, setSvcDesc] = useState('')
+  const [svcPrice, setSvcPrice] = useState('')
+  const [svcFeatures, setSvcFeatures] = useState('')
+  const [svcPopular, setSvcPopular] = useState(false)
+  const [svcSort, setSvcSort] = useState(0)
+  const [svcEditingId, setSvcEditingId] = useState<string | null>(null)
   const [postTitle, setPostTitle] = useState('')
   const [postBody, setPostBody] = useState('')
   const [postType, setPostType] = useState<'news' | 'event'>('news')
@@ -41,12 +49,76 @@ export default function AdminPage() {
 
   async function loadData() {
     if (!supabase) return
-    const [g, p] = await Promise.all([
+    const [g, p, s] = await Promise.all([
       supabase.from('gallery_items').select('*').order('sort_order'),
       supabase.from('posts').select('*').order('created_at', { ascending: false }),
+      supabase.from('services').select('*').order('sort_order'),
     ])
     if (g.data) setGallery(g.data as GalleryItem[])
     if (p.data) setPosts(p.data as Post[])
+    if (s.data) setServices(s.data as Service[])
+  }
+
+  function parseFeatures(text: string): string[] {
+    return text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+  }
+
+  function resetServiceForm(nextSort = services.length) {
+    setSvcName('')
+    setSvcDesc('')
+    setSvcPrice('')
+    setSvcFeatures('')
+    setSvcPopular(false)
+    setSvcSort(nextSort)
+    setSvcEditingId(null)
+  }
+
+  function editService(s: Service) {
+    setSvcEditingId(s.id)
+    setSvcName(s.name)
+    setSvcDesc(s.description)
+    setSvcPrice(s.price_text)
+    setSvcFeatures(s.features.join('\n'))
+    setSvcPopular(s.is_popular)
+    setSvcSort(s.sort_order)
+    setError('')
+  }
+
+  async function saveService(e: FormEvent) {
+    e.preventDefault()
+    if (!supabase) return
+    setError('')
+
+    const payload = {
+      name: svcName.trim(),
+      description: svcDesc.trim(),
+      price_text: svcPrice.trim(),
+      features: parseFeatures(svcFeatures),
+      is_popular: svcPopular,
+      sort_order: svcSort,
+      published: true,
+    }
+
+    const { error: err } = svcEditingId
+      ? await supabase.from('services').update(payload).eq('id', svcEditingId)
+      : await supabase.from('services').insert(payload)
+
+    if (err) {
+      setError(err.message)
+      return
+    }
+
+    resetServiceForm()
+    loadData()
+  }
+
+  async function deleteService(id: string) {
+    await supabase?.from('services').delete().eq('id', id)
+    if (svcEditingId === id) resetServiceForm()
+    loadData()
   }
 
   async function handleLogin(e: FormEvent) {
@@ -181,7 +253,6 @@ export default function AdminPage() {
           <AdminBrand />
           <p className="admin-eyebrow">Boshqaruv paneli</p>
           <h1>Kirish</h1>
-          <p className="admin-muted">Supabase-da yaratilgan email va parol</p>
           <form onSubmit={handleLogin} className="admin-form">
             <label className="admin-field">
               <span>Email</span>
@@ -217,6 +288,13 @@ export default function AdminPage() {
           <nav className="admin-tabs" aria-label="Admin sections">
             <button
               type="button"
+              className={tab === 'services' ? 'active' : ''}
+              onClick={() => setTab('services')}
+            >
+              Xizmatlar
+            </button>
+            <button
+              type="button"
               className={tab === 'gallery' ? 'active' : ''}
               onClick={() => setTab('gallery')}
             >
@@ -243,6 +321,113 @@ export default function AdminPage() {
 
       <main className="admin-main">
         {error && <p className="admin-alert admin-alert--bar">{error}</p>}
+
+        {tab === 'services' && (
+          <div className="admin-layout admin-layout--split">
+            <section className="admin-card">
+              <h2>{svcEditingId ? 'Xizmatni tahrirlash' : 'Yangi xizmat / narx'}</h2>
+              <p className="admin-muted">
+                Saytdagi xizmat kartochkalari va buyurtma formasi shu yerdan to‘ldiriladi.
+              </p>
+              <form onSubmit={saveService} className="admin-form">
+                <label className="admin-field">
+                  <span>Nomi</span>
+                  <input value={svcName} onChange={(e) => setSvcName(e.target.value)} required />
+                </label>
+                <label className="admin-field">
+                  <span>Qisqa tavsif</span>
+                  <textarea
+                    rows={3}
+                    value={svcDesc}
+                    onChange={(e) => setSvcDesc(e.target.value)}
+                    required
+                  />
+                </label>
+                <label className="admin-field">
+                  <span>Narx (matn)</span>
+                  <input
+                    value={svcPrice}
+                    onChange={(e) => setSvcPrice(e.target.value)}
+                    placeholder="masalan: 1 500 000 so‘m yoki Kelishuv asosida"
+                    required
+                  />
+                </label>
+                <label className="admin-field">
+                  <span>Imkoniyatlar (har qator — bitta punkt)</span>
+                  <textarea
+                    rows={5}
+                    value={svcFeatures}
+                    onChange={(e) => setSvcFeatures(e.target.value)}
+                    placeholder={'Piknik uslubida bezak\nJoylashtirish va yig‘ish'}
+                  />
+                </label>
+                <label className="admin-field admin-field--row">
+                  <input
+                    type="checkbox"
+                    checked={svcPopular}
+                    onChange={(e) => setSvcPopular(e.target.checked)}
+                  />
+                  <span>Eng ko‘p buyurtma (badge)</span>
+                </label>
+                <label className="admin-field">
+                  <span>Tartib (kichik raqam — oldinroq)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={svcSort}
+                    onChange={(e) => setSvcSort(Number(e.target.value))}
+                  />
+                </label>
+                <div className="admin-form-actions">
+                  <button type="submit" className="btn btn-primary admin-btn-full">
+                    {svcEditingId ? 'Saqlash' : 'Qo‘shish'}
+                  </button>
+                  {svcEditingId && (
+                    <button
+                      type="button"
+                      className="admin-btn-ghost"
+                      onClick={() => resetServiceForm()}
+                    >
+                      Bekor qilish
+                    </button>
+                  )}
+                </div>
+              </form>
+            </section>
+
+            <section className="admin-card admin-card--grow">
+              <h2>Xizmatlar ({services.length})</h2>
+              {services.length === 0 ? (
+                <p className="admin-empty">
+                  Hali xizmat yo‘q. Qo‘shing — saytda standart 3 ta karta o‘rniga ular chiqadi.
+                </p>
+              ) : (
+                <ul className="admin-service-list">
+                  {services.map((s) => (
+                    <li key={s.id} className="admin-service-item">
+                      <div className="admin-service-item-body">
+                        <span className={`admin-badge ${s.is_popular ? 'admin-badge--event' : 'admin-badge--news'}`}>
+                          {s.is_popular ? 'Mashhur' : 'Xizmat'} · #{s.sort_order}
+                        </span>
+                        <h3>{s.name}</h3>
+                        <p className="admin-service-price">{s.price_text}</p>
+                        <p className="admin-muted">{s.description.slice(0, 100)}{s.description.length > 100 ? '…' : ''}</p>
+                      </div>
+                      <div className="admin-service-actions">
+                        <button type="button" className="admin-btn-ghost" onClick={() => editService(s)}>
+                          Tahrirlash
+                        </button>
+                        <button type="button" className="admin-btn-danger" onClick={() => deleteService(s.id)}>
+                          O‘chirish
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        )}
 
         {tab === 'gallery' && (
           <div className="admin-layout">

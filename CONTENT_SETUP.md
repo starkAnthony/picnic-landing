@@ -25,6 +25,8 @@ Without Supabase, the site still works with static images in `public/images/`.
 
 **SQL Editor** → paste `supabase/schema.sql` → **Run**.
 
+Agar loyiha allaqachon yaratilgan bo‘lsa, qo‘shimcha jadval uchun **`supabase/services.sql`** ni ham ishga tushiring (xizmat kartochkalari va narxlar).
+
 ### Storage bucket + upload (fixes “row-level security” error)
 
 **A) Bucket (bir marta)**
@@ -111,8 +113,9 @@ The site section **“Instagramdan”** will show latest posts automatically. Un
 
 URL: **`/admin`**
 
+- **Xizmatlar** — xizmat nomi, tavsif, narx (matn), imkoniyatlar ro‘yxati, “eng ko‘p buyurtma” belgisi
 - **Gallery** — upload images (stored in Supabase)
-- **News & events** — title, text, optional image URL, event date
+- **News & events** — title, text, surat yuklash, event date
 
 Changes appear on the live site immediately (no git push needed).
 

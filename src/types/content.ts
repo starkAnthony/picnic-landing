@@ -5,6 +5,17 @@ export type GalleryItem = {
   sort_order: number
 }
 
+export type Service = {
+  id: string
+  name: string
+  description: string
+  price_text: string
+  price_amount: number | null
+  features: string[]
+  is_popular: boolean
+  sort_order: number
+}
+
 export type Post = {
   id: string
   title: string

@@ -65,6 +65,7 @@ const en: Translations = {
     popularBadge: 'Most booked',
     priceOnRequest: 'Price on request',
     select: 'Request this service',
+    loading: 'Loading…',
     items: [
       {
         name: 'Decorated photo zone',

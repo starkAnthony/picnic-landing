@@ -9,6 +9,20 @@ create table if not exists public.gallery_items (
   created_at timestamptz default now()
 );
 
+-- Service plans (admin-managed cards with prices)
+create table if not exists public.services (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text not null default '',
+  price_text text not null default '',
+  price_amount numeric,
+  features text[] not null default '{}',
+  is_popular boolean not null default false,
+  sort_order int not null default 0,
+  published boolean not null default true,
+  created_at timestamptz default now()
+);
+
 -- News & events
 create table if not exists public.posts (
   id uuid primary key default gen_random_uuid(),
@@ -22,6 +36,7 @@ create table if not exists public.posts (
 );
 
 alter table public.gallery_items enable row level security;
+alter table public.services enable row level security;
 alter table public.posts enable row level security;
 
 -- Everyone can read published content
@@ -35,6 +50,11 @@ create policy "Public read published posts"
   to anon, authenticated
   using (published = true);
 
+create policy "Public read published services"
+  on public.services for select
+  to anon, authenticated
+  using (published = true);
+
 -- Only logged-in owner can manage
 create policy "Auth insert gallery"
   on public.gallery_items for insert to authenticated with check (true);
@@ -44,6 +64,15 @@ create policy "Auth update gallery"
 
 create policy "Auth delete gallery"
   on public.gallery_items for delete to authenticated using (true);
+
+create policy "Auth insert services"
+  on public.services for insert to authenticated with check (true);
+
+create policy "Auth update services"
+  on public.services for update to authenticated using (true);
+
+create policy "Auth delete services"
+  on public.services for delete to authenticated using (true);
 
 create policy "Auth insert posts"
   on public.posts for insert to authenticated with check (true);

@@ -2,6 +2,12 @@
   background: var(--white);
 }
 
+.packages-loading {
+  margin-top: 2rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 .packages .section-subtitle {
   margin-bottom: 3rem;
 }
