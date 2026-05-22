@@ -10,17 +10,38 @@ Visitors stay on the site. Messages arrive in **your Telegram app** from your bo
 4. Choose a username (e.g. `sevinc_picnic_bot`)
 5. Copy the **token** (looks like `7123456789:AAH...`)
 
-## 2. Get your chat ID (demo: @tony_not)
+## 2. Get `TELEGRAM_CHAT_ID`
 
-1. Open **your bot** in Telegram (the link BotFather gives you)
-2. Press **Start** or send any message, e.g. `hi`
-3. In a browser open (replace `TOKEN`):
+### Option A — Private chat (messages only to you)
+
+1. Open **your bot** in Telegram (BotFather link)
+2. Press **Start** or send `hi`
+3. Browser (replace `TOKEN`):
 
    ```
    https://api.telegram.org/botTOKEN/getUpdates
    ```
 
-4. Find `"chat":{"id":123456789` — that number is **TELEGRAM_CHAT_ID**
+4. Find `"chat":{"id":8175279023` — positive number → **TELEGRAM_CHAT_ID**
+
+### Option B — Telegram group (team sees bookings)
+
+1. Create a group → **Add members** → add your **bot** (as member; admin is fine)
+2. In the **group**, send any message, e.g. `test` (so Telegram registers the chat)
+3. Open the same URL:
+
+   ```
+   https://api.telegram.org/botTOKEN/getUpdates
+   ```
+
+4. Find the latest message where `"chat":{"id":-1001234567890` — use that **full number including minus**
+
+   - Supergroup IDs almost always start with **`-100`**
+   - Do **not** use a person’s user ID (positive number like `5191230976`) — that is not the group ID
+
+5. **TELEGRAM_CHAT_ID** on Vercel = exactly that value, e.g. `-1002876543210`
+
+**“Start” in the bot is only for private chat (Option A).** For groups you do not press Start — you only need the correct **group** `chat.id`.
 
 ## 3. Add secrets on Vercel
 

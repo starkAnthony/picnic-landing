@@ -168,7 +168,7 @@ const ru: Translations = {
     errorNoApi:
       'Работает только на опубликованном сайте, не в npm run dev. Откройте URL Vercel или npx vercel dev.',
     errorChatNotFound:
-      'Сначала нажмите Start в вашем Telegram-боте, затем отправьте снова.',
+      'Неверный TELEGRAM_CHAT_ID. Для группы: добавьте бота, напишите в группе, возьмите id -100... из getUpdates. Для личного чата: Start в боте. Обновите Vercel и Redeploy.',
     errorBadToken: 'Неверный токен бота. Проверьте TELEGRAM_BOT_TOKEN на Vercel.',
     errorFailed: 'Не удалось отправить. Попробуйте снова или позвоните нам.',
     errorNetwork: 'Ошибка соединения. Попробуйте снова.',

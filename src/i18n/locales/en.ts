@@ -167,7 +167,7 @@ const en: Translations = {
     errorNoApi:
       'This only works on the deployed site, not npm run dev. Open your Vercel URL or run npx vercel dev.',
     errorChatNotFound:
-      'Press Start in your Telegram bot first, then try again.',
+      'Wrong TELEGRAM_CHAT_ID. For a group: add the bot, send a message in the group, copy the -100... id from getUpdates. For DM: press Start in the bot. Update Vercel and Redeploy.',
     errorBadToken: 'Invalid bot token. Check TELEGRAM_BOT_TOKEN on Vercel.',
     errorFailed: 'Could not send. Please try again or call us.',
     errorNetwork: 'Connection error. Please try again.',

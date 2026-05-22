@@ -156,7 +156,7 @@ export default function Booking() {
                 </label>
                 <label>
                   {t.booking.guests}
-                  <input type="number" name="guests" min={2} max={12} defaultValue={2} required />
+                  <input type="number" name="guests" min={1} required />
                 </label>
               </div>
               <label>
