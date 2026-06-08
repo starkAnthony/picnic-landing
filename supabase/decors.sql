@@ -6,6 +6,10 @@ create table if not exists public.decors (
   name_uz text not null,
   name_ru text,
   name_en text,
+  price_text text,
+  price_text_uz text,
+  price_text_ru text,
+  price_text_en text,
   sort_order int not null default 0,
   published boolean not null default true,
   created_at timestamptz default now()

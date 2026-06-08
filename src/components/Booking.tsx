@@ -5,7 +5,7 @@ import {
 } from '../lib/bookingSelection'
 import { useDecors } from '../hooks/useDecors'
 import { useServices } from '../hooks/useServices'
-import { decorsForService } from '../lib/localizeDecor'
+import { decorsForService, formatDecorLabel } from '../lib/localizeDecor'
 import { useI18n } from '../i18n/context'
 import { buildBookingMessage } from '../lib/bookingMessage'
 import { sendBookingToTelegram, type TelegramSendResult } from '../lib/bookingTelegram'
@@ -98,10 +98,10 @@ export default function Booking() {
     setError('')
 
     const form = e.currentTarget
-    const decorNames = availableDecors
+    const decorLines = availableDecors
       .filter((d) => selectedDecors.includes(d.id))
-      .map((d) => d.name)
-    const message = buildBookingMessage(form, t, { decorNames })
+      .map((d) => formatDecorLabel(d, t.packages.priceOnRequest))
+    const message = buildBookingMessage(form, t, { decorLines })
     const result = await sendBookingToTelegram(message)
 
     if (result.ok) {
@@ -221,6 +221,9 @@ export default function Booking() {
                               </span>
                             </span>
                             <span className="booking-decor-card__name">{decor.name}</span>
+                            <span className="booking-decor-card__price">
+                              {decor.price_text.trim() || t.packages.priceOnRequest}
+                            </span>
                           </button>
                           <button
                             type="button"
@@ -297,9 +300,14 @@ export default function Booking() {
             <div className="booking-decor-lightbox__image-wrap">
               <img src={previewDecor.image_url} alt={previewDecor.name} />
             </div>
-            <h3 id="booking-decor-preview-title" className="booking-decor-lightbox__title">
-              {previewDecor.name}
-            </h3>
+            <div className="booking-decor-lightbox__meta">
+              <h3 id="booking-decor-preview-title" className="booking-decor-lightbox__title">
+                {previewDecor.name}
+              </h3>
+              <p className="booking-decor-lightbox__price">
+                {previewDecor.price_text.trim() || t.packages.priceOnRequest}
+              </p>
+            </div>
             <button
               type="button"
               className={`btn ${selectedDecors.includes(previewDecor.id) ? 'btn-outline' : 'btn-primary'}`}

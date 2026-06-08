@@ -3,7 +3,7 @@ import type { Translations } from '../i18n/types'
 export function buildBookingMessage(
   form: HTMLFormElement,
   t: Translations,
-  extras?: { decorNames?: string[] },
+  extras?: { decorLines?: string[] },
 ): string {
   const data = new FormData(form)
   const packageSelect = form.elements.namedItem('package') as HTMLSelectElement | null
@@ -19,9 +19,9 @@ export function buildBookingMessage(
     `${t.booking.guests}: ${data.get('guests')}`,
   ]
 
-  const decorNames = extras?.decorNames?.filter(Boolean) ?? []
-  if (decorNames.length) {
-    lines.push(`${t.booking.decors}: ${decorNames.join(', ')}`)
+  const decorLines = extras?.decorLines?.filter(Boolean) ?? []
+  if (decorLines.length) {
+    lines.push(`${t.booking.decors}: ${decorLines.join(', ')}`)
   }
 
   const notes = String(data.get('notes') ?? '').trim()

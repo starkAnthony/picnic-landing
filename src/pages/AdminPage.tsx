@@ -25,6 +25,27 @@ type AdminDecorRow = DecorRecord & {
   service_decors?: { service_id: string }[] | null
 }
 
+type DecorLocaleForm = {
+  name: string
+  price: string
+}
+
+const emptyDecorLocale = (): DecorLocaleForm => ({
+  name: '',
+  price: '',
+})
+
+function recordToDecorForm(row: DecorRecord, locale: Locale): DecorLocaleForm {
+  const nameKey = `name_${locale}` as keyof DecorRecord
+  const priceKey = `price_text_${locale}` as keyof DecorRecord
+
+  const name = (row[nameKey] as string | null) ?? row.name_uz ?? ''
+  const price =
+    (row[priceKey] as string | null) ?? row.price_text_uz ?? row.price_text ?? ''
+
+  return { name, price }
+}
+
 const emptyServiceLocale = (): ServiceLocaleForm => ({
   name: '',
   desc: '',
@@ -85,9 +106,9 @@ export default function AdminPage() {
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
   const [heroUploading, setHeroUploading] = useState(false)
   const [decorList, setDecorList] = useState<AdminDecorRow[]>([])
-  const [decorNameUz, setDecorNameUz] = useState('')
-  const [decorNameRu, setDecorNameRu] = useState('')
-  const [decorNameEn, setDecorNameEn] = useState('')
+  const [decorUz, setDecorUz] = useState<DecorLocaleForm>(emptyDecorLocale)
+  const [decorRu, setDecorRu] = useState<DecorLocaleForm>(emptyDecorLocale)
+  const [decorEn, setDecorEn] = useState<DecorLocaleForm>(emptyDecorLocale)
   const [decorImageUrl, setDecorImageUrl] = useState<string | null>(null)
   const [decorImageFile, setDecorImageFile] = useState<File | null>(null)
   const [decorImagePreview, setDecorImagePreview] = useState<string | null>(null)
@@ -279,9 +300,9 @@ export default function AdminPage() {
   }
 
   function resetDecorForm(nextSort = decorList.length) {
-    setDecorNameUz('')
-    setDecorNameRu('')
-    setDecorNameEn('')
+    setDecorUz(emptyDecorLocale())
+    setDecorRu(emptyDecorLocale())
+    setDecorEn(emptyDecorLocale())
     setDecorImageUrl(null)
     setDecorImageFile(null)
     setDecorImagePreview(null)
@@ -299,9 +320,9 @@ export default function AdminPage() {
 
   function editDecor(row: AdminDecorRow) {
     setDecorEditingId(row.id)
-    setDecorNameUz(row.name_uz)
-    setDecorNameRu(row.name_ru ?? '')
-    setDecorNameEn(row.name_en ?? '')
+    setDecorUz(recordToDecorForm(row, 'uz'))
+    setDecorRu(recordToDecorForm(row, 'ru'))
+    setDecorEn(recordToDecorForm(row, 'en'))
     setDecorImageUrl(row.image_url)
     setDecorImageFile(null)
     setDecorImagePreview(row.image_url)
@@ -341,8 +362,14 @@ export default function AdminPage() {
     setError('')
     setDecorSubmitting(true)
 
-    if (!decorNameUz.trim()) {
+    if (!decorUz.name.trim()) {
       setError('O‘zbekcha bezak nomi majburiy.')
+      setDecorSubmitting(false)
+      return
+    }
+
+    if (!decorUz.price.trim()) {
+      setError('O‘zbekcha narx majburiy.')
       setDecorSubmitting(false)
       return
     }
@@ -366,9 +393,13 @@ export default function AdminPage() {
 
     const payload = {
       image_url: imageUrl,
-      name_uz: decorNameUz.trim(),
-      name_ru: decorNameRu.trim() || decorNameUz.trim(),
-      name_en: decorNameEn.trim() || decorNameUz.trim(),
+      name_uz: decorUz.name.trim(),
+      name_ru: decorRu.name.trim() || decorUz.name.trim(),
+      name_en: decorEn.name.trim() || decorUz.name.trim(),
+      price_text_uz: decorUz.price.trim(),
+      price_text_ru: decorRu.price.trim() || decorUz.price.trim(),
+      price_text_en: decorEn.price.trim() || decorUz.price.trim(),
+      price_text: decorUz.price.trim(),
       sort_order: decorSort,
       published: true,
     }
@@ -952,17 +983,17 @@ export default function AdminPage() {
                 <div className="admin-locale-tabs" role="tablist" aria-label="Bezak tili">
                   {(
                     [
-                      { key: 'uz' as const, label: 'O‘zbekcha', filled: decorNameUz },
-                      { key: 'ru' as const, label: 'Русский', filled: decorNameRu },
-                      { key: 'en' as const, label: 'English', filled: decorNameEn },
+                      { key: 'uz' as const, label: 'O‘zbekcha', form: decorUz },
+                      { key: 'ru' as const, label: 'Русский', form: decorRu },
+                      { key: 'en' as const, label: 'English', form: decorEn },
                     ] as const
-                  ).map(({ key, label, filled }) => (
+                  ).map(({ key, label, form }) => (
                     <button
                       key={key}
                       type="button"
                       role="tab"
                       aria-selected={decorLocaleTab === key}
-                      className={`admin-locale-tab${decorLocaleTab === key ? ' is-active' : ''}${filled.trim() ? ' is-filled' : ''}`}
+                      className={`admin-locale-tab${decorLocaleTab === key ? ' is-active' : ''}${form.name.trim() ? ' is-filled' : ''}`}
                       onClick={() => setDecorLocaleTab(key)}
                     >
                       {label}
@@ -970,30 +1001,38 @@ export default function AdminPage() {
                   ))}
                 </div>
 
-                <div className="admin-locale-panel">
-                  {decorLocaleTab === 'uz' && (
-                    <label className="admin-field">
-                      <span>{decorFormLabels.uz.name}</span>
-                      <input
-                        value={decorNameUz}
-                        onChange={(e) => setDecorNameUz(e.target.value)}
-                        required
-                      />
-                    </label>
-                  )}
-                  {decorLocaleTab === 'ru' && (
-                    <label className="admin-field">
-                      <span>{decorFormLabels.ru.name}</span>
-                      <input value={decorNameRu} onChange={(e) => setDecorNameRu(e.target.value)} />
-                    </label>
-                  )}
-                  {decorLocaleTab === 'en' && (
-                    <label className="admin-field">
-                      <span>{decorFormLabels.en.name}</span>
-                      <input value={decorNameEn} onChange={(e) => setDecorNameEn(e.target.value)} />
-                    </label>
-                  )}
-                </div>
+                {(
+                  [
+                    { key: 'uz' as const, form: decorUz, set: setDecorUz, required: true },
+                    { key: 'ru' as const, form: decorRu, set: setDecorRu, required: false },
+                    { key: 'en' as const, form: decorEn, set: setDecorEn, required: false },
+                  ] as const
+                )
+                  .filter(({ key }) => key === decorLocaleTab)
+                  .map(({ key, form, set, required }) => {
+                    const L = decorFormLabels[key]
+                    return (
+                      <div key={key} className="admin-locale-panel">
+                        <label className="admin-field">
+                          <span>{L.name}</span>
+                          <input
+                            value={form.name}
+                            onChange={(e) => set({ ...form, name: e.target.value })}
+                            required={required}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>{L.price}</span>
+                          <input
+                            value={form.price}
+                            onChange={(e) => set({ ...form, price: e.target.value })}
+                            placeholder={L.pricePlaceholder}
+                            required={required}
+                          />
+                        </label>
+                      </div>
+                    )
+                  })}
 
                 <div className="admin-service-picker">
                   <div className="admin-service-picker__head">
@@ -1074,6 +1113,9 @@ export default function AdminPage() {
                       <img src={d.image_url} alt="" className="admin-decor-thumb" />
                       <div className="admin-decor-item-body">
                         <h3>{d.name_uz}</h3>
+                        <p className="admin-service-price">
+                          {d.price_text_uz ?? d.price_text ?? '—'}
+                        </p>
                         <p className="admin-muted">
                           {(d.service_decors ?? []).length === 0
                             ? 'Barcha xizmatlar'

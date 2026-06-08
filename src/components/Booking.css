@@ -258,14 +258,25 @@
 .booking-decor-card__name {
   display: block;
   margin-top: 0.5rem;
-  padding: 0 0.15rem 0.2rem;
+  padding: 0 0.15rem;
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.35;
   color: var(--charcoal);
 }
 
-.booking-decor-card.is-selected .booking-decor-card__name {
+.booking-decor-card__price {
+  display: block;
+  margin-top: 0.15rem;
+  padding: 0 0.15rem 0.2rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--sage-dark);
+}
+
+.booking-decor-card.is-selected .booking-decor-card__name,
+.booking-decor-card.is-selected .booking-decor-card__price {
   color: var(--sage-dark);
 }
 
@@ -368,12 +379,22 @@
   object-fit: contain;
 }
 
+.booking-decor-lightbox__meta {
+  padding-right: 2rem;
+}
+
 .booking-decor-lightbox__title {
   font-family: var(--font-serif);
   font-size: 1.2rem;
   margin: 0;
-  padding-right: 2rem;
   color: var(--charcoal);
+}
+
+.booking-decor-lightbox__price {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sage-dark);
 }
 
 .booking-decor-lightbox__panel .btn {

@@ -53,6 +53,7 @@ export type Post = {
 export type Decor = {
   id: string
   name: string
+  price_text: string
   image_url: string
   sort_order: number
   /** Empty = available for all services */
@@ -65,6 +66,10 @@ export type DecorRecord = {
   name_uz: string
   name_ru?: string | null
   name_en?: string | null
+  price_text?: string | null
+  price_text_uz?: string | null
+  price_text_ru?: string | null
+  price_text_en?: string | null
   sort_order: number
   published: boolean
 }
