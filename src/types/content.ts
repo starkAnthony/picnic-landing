@@ -50,6 +50,25 @@ export type Post = {
   created_at: string
 }
 
+export type Decor = {
+  id: string
+  name: string
+  image_url: string
+  sort_order: number
+  /** Empty = available for all services */
+  serviceIds: string[]
+}
+
+export type DecorRecord = {
+  id: string
+  image_url: string
+  name_uz: string
+  name_ru?: string | null
+  name_en?: string | null
+  sort_order: number
+  published: boolean
+}
+
 export type InstagramMedia = {
   id: string
   caption?: string

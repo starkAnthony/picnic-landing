@@ -3,7 +3,12 @@ import { createClient } from '@supabase/supabase-js'
 type Req = {
   method?: string
   headers?: { authorization?: string }
-  body?: { fileName?: string; contentType?: string; data?: string; kind?: 'gallery' | 'post' | 'hero' }
+  body?: {
+    fileName?: string
+    contentType?: string
+    data?: string
+    kind?: 'gallery' | 'post' | 'hero' | 'decor'
+  }
 }
 
 type Res = {
@@ -42,11 +47,23 @@ export default async function handler(req: Req, res: Res) {
   }
 
   const kind =
-    req.body?.kind === 'post' ? 'post' : req.body?.kind === 'hero' ? 'hero' : 'gallery'
+    req.body?.kind === 'post'
+      ? 'post'
+      : req.body?.kind === 'hero'
+        ? 'hero'
+        : req.body?.kind === 'decor'
+          ? 'decor'
+          : 'gallery'
   const ext = fileName.split('.').pop()?.toLowerCase() ?? 'jpg'
   const stamp = Date.now()
   const path =
-    kind === 'post' ? `posts/${stamp}.${ext}` : kind === 'hero' ? `hero/${stamp}.${ext}` : `${stamp}.${ext}`
+    kind === 'post'
+      ? `posts/${stamp}.${ext}`
+      : kind === 'hero'
+        ? `hero/${stamp}.${ext}`
+        : kind === 'decor'
+          ? `decors/${stamp}.${ext}`
+          : `${stamp}.${ext}`
   const buffer = Buffer.from(data, 'base64')
   const mime = contentType || `image/${ext === 'png' ? 'png' : 'jpeg'}`
 

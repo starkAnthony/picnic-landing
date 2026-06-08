@@ -1,3 +1,6 @@
+/** Public site URL (QR codes, sharing) */
+export const SITE_URL = 'https://picnic-landing.vercel.app'
+
 /** Default contact info when Supabase settings are not loaded yet */
 export const DEFAULT_PHONE_DISPLAY = '+998 99 442 60 30'
 export const DEFAULT_TELEGRAM_USERNAME = 'tony_not'

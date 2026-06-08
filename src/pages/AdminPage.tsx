@@ -8,9 +8,10 @@ import {
   DEFAULT_TELEGRAM_USERNAME,
   normalizeUsername,
 } from '../site'
-import { uploadGalleryImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import { uploadGalleryImage, uploadDecorImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import { decorFormLabels } from '../admin/decorFormLabels'
 import { serviceFormLabels } from '../admin/serviceFormLabels'
-import type { GalleryItem, Post, ServiceRecord } from '../types/content'
+import type { DecorRecord, GalleryItem, Post, ServiceRecord } from '../types/content'
 import type { Locale } from '../i18n/types'
 
 type ServiceLocaleForm = {
@@ -18,6 +19,10 @@ type ServiceLocaleForm = {
   desc: string
   price: string
   features: string
+}
+
+type AdminDecorRow = DecorRecord & {
+  service_decors?: { service_id: string }[] | null
 }
 
 const emptyServiceLocale = (): ServiceLocaleForm => ({
@@ -52,7 +57,7 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<'settings' | 'services' | 'gallery' | 'posts'>('settings')
+  const [tab, setTab] = useState<'settings' | 'services' | 'decors' | 'gallery' | 'posts'>('settings')
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [posts, setPosts] = useState<Post[]>([])
   const [services, setServices] = useState<ServiceRecord[]>([])
@@ -79,6 +84,18 @@ export default function AdminPage() {
   const [settingsSaving, setSettingsSaving] = useState(false)
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
   const [heroUploading, setHeroUploading] = useState(false)
+  const [decorList, setDecorList] = useState<AdminDecorRow[]>([])
+  const [decorNameUz, setDecorNameUz] = useState('')
+  const [decorNameRu, setDecorNameRu] = useState('')
+  const [decorNameEn, setDecorNameEn] = useState('')
+  const [decorImageUrl, setDecorImageUrl] = useState<string | null>(null)
+  const [decorImageFile, setDecorImageFile] = useState<File | null>(null)
+  const [decorImagePreview, setDecorImagePreview] = useState<string | null>(null)
+  const [decorServiceIds, setDecorServiceIds] = useState<string[]>([])
+  const [decorSort, setDecorSort] = useState(0)
+  const [decorEditingId, setDecorEditingId] = useState<string | null>(null)
+  const [decorLocaleTab, setDecorLocaleTab] = useState<Locale>('uz')
+  const [decorSubmitting, setDecorSubmitting] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -98,15 +115,17 @@ export default function AdminPage() {
 
   async function loadData() {
     if (!supabase) return
-    const [g, p, s, settings] = await Promise.all([
+    const [g, p, s, d, settings] = await Promise.all([
       supabase.from('gallery_items').select('*').order('sort_order'),
       supabase.from('posts').select('*').order('created_at', { ascending: false }),
       supabase.from('services').select('*').order('sort_order'),
+      supabase.from('decors').select('*, service_decors(service_id)').order('sort_order'),
       supabase.from('site_settings').select('*').eq('id', 1).maybeSingle(),
     ])
     if (g.data) setGallery(g.data as GalleryItem[])
     if (p.data) setPosts(p.data as Post[])
     if (s.data) setServices(s.data as ServiceRecord[])
+    if (d.data) setDecorList(d.data as AdminDecorRow[])
     if (settings.data) {
       setPhoneDisplay(settings.data.phone_display ?? DEFAULT_PHONE_DISPLAY)
       setTelegramUsername(normalizeUsername(settings.data.telegram_username ?? DEFAULT_TELEGRAM_USERNAME))
@@ -256,6 +275,134 @@ export default function AdminPage() {
   async function deleteService(id: string) {
     await supabase?.from('services').delete().eq('id', id)
     if (svcEditingId === id) resetServiceForm()
+    loadData()
+  }
+
+  function resetDecorForm(nextSort = decorList.length) {
+    setDecorNameUz('')
+    setDecorNameRu('')
+    setDecorNameEn('')
+    setDecorImageUrl(null)
+    setDecorImageFile(null)
+    setDecorImagePreview(null)
+    setDecorServiceIds([])
+    setDecorSort(nextSort)
+    setDecorEditingId(null)
+    setDecorLocaleTab('uz')
+  }
+
+  function onDecorImageSelect(file: File | undefined) {
+    if (!file) return
+    setDecorImageFile(file)
+    setDecorImagePreview(URL.createObjectURL(file))
+  }
+
+  function editDecor(row: AdminDecorRow) {
+    setDecorEditingId(row.id)
+    setDecorNameUz(row.name_uz)
+    setDecorNameRu(row.name_ru ?? '')
+    setDecorNameEn(row.name_en ?? '')
+    setDecorImageUrl(row.image_url)
+    setDecorImageFile(null)
+    setDecorImagePreview(row.image_url)
+    setDecorServiceIds((row.service_decors ?? []).map((l) => l.service_id))
+    setDecorSort(row.sort_order)
+    setDecorLocaleTab('uz')
+    setError('')
+  }
+
+  function setDecorAllServices() {
+    setDecorServiceIds([])
+  }
+
+  function toggleDecorService(serviceId: string) {
+    setDecorServiceIds((prev) => {
+      if (prev.length === 0) return [serviceId]
+      if (prev.includes(serviceId)) {
+        const next = prev.filter((id) => id !== serviceId)
+        return next
+      }
+      return [...prev, serviceId]
+    })
+  }
+
+  async function syncDecorServices(decorId: string, serviceIds: string[]) {
+    if (!supabase) return
+    await supabase.from('service_decors').delete().eq('decor_id', decorId)
+    if (serviceIds.length === 0) return
+    await supabase.from('service_decors').insert(
+      serviceIds.map((service_id) => ({ service_id, decor_id: decorId })),
+    )
+  }
+
+  async function saveDecor(e: FormEvent) {
+    e.preventDefault()
+    if (!supabase) return
+    setError('')
+    setDecorSubmitting(true)
+
+    if (!decorNameUz.trim()) {
+      setError('O‘zbekcha bezak nomi majburiy.')
+      setDecorSubmitting(false)
+      return
+    }
+
+    let imageUrl = decorImageUrl
+    if (decorImageFile) {
+      const uploaded = await uploadDecorImage(decorImageFile)
+      if (!uploaded.ok) {
+        setError(uploaded.error)
+        setDecorSubmitting(false)
+        return
+      }
+      imageUrl = uploaded.image_url
+    }
+
+    if (!imageUrl) {
+      setError('Bezak surati kerak.')
+      setDecorSubmitting(false)
+      return
+    }
+
+    const payload = {
+      image_url: imageUrl,
+      name_uz: decorNameUz.trim(),
+      name_ru: decorNameRu.trim() || decorNameUz.trim(),
+      name_en: decorNameEn.trim() || decorNameUz.trim(),
+      sort_order: decorSort,
+      published: true,
+    }
+
+    let decorId = decorEditingId
+    if (decorEditingId) {
+      const { error: err } = await supabase.from('decors').update(payload).eq('id', decorEditingId)
+      if (err) {
+        setError(err.message)
+        setDecorSubmitting(false)
+        return
+      }
+    } else {
+      const { data, error: err } = await supabase.from('decors').insert(payload).select('id').single()
+      if (err || !data) {
+        setError(err?.message ?? 'Saqlab bo‘lmadi')
+        setDecorSubmitting(false)
+        return
+      }
+      decorId = data.id
+    }
+
+    if (decorId) {
+      await syncDecorServices(decorId, decorServiceIds)
+    }
+
+    setDecorSubmitting(false)
+    resetDecorForm()
+    loadData()
+  }
+
+  async function deleteDecor(id: string) {
+    await supabase?.from('decors').delete().eq('id', id)
+    if (decorEditingId === id) resetDecorForm()
     loadData()
   }
 
@@ -437,6 +584,13 @@ export default function AdminPage() {
               onClick={() => setTab('services')}
             >
               Xizmatlar
+            </button>
+            <button
+              type="button"
+              className={tab === 'decors' ? 'active' : ''}
+              onClick={() => setTab('decors')}
+            >
+              Bezaklar
             </button>
             <button
               type="button"
@@ -752,6 +906,186 @@ export default function AdminPage() {
                           Tahrirlash
                         </button>
                         <button type="button" className="admin-btn-danger" onClick={() => deleteService(s.id)}>
+                          O‘chirish
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        )}
+
+        {tab === 'decors' && (
+          <div className="admin-layout admin-layout--split admin-layout--services">
+            <section className="admin-card admin-card--form">
+              <h2>{decorEditingId ? 'Bezakni tahrirlash' : 'Yangi bezak'}</h2>
+              <p className="admin-muted admin-muted--tight">
+                Mijoz buyurtma formasida tanlaydi. Xizmat tanlanganda faqat shu xizmatga bog‘langan
+                bezaklar chiqadi. Hech qaysi xizmat belgilanmasa — barcha xizmatlar uchun ko‘rinadi.
+              </p>
+              <form onSubmit={saveDecor} className="admin-form admin-form--service">
+                <div className="admin-field">
+                  <span>Surat</span>
+                  {decorImagePreview && (
+                    <div className="admin-decor-preview">
+                      <img src={decorImagePreview} alt="" />
+                    </div>
+                  )}
+                  <label className={`admin-upload admin-upload--compact ${decorSubmitting ? 'is-uploading' : ''}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={decorSubmitting}
+                      onChange={(e) => {
+                        onDecorImageSelect(e.target.files?.[0])
+                        e.target.value = ''
+                      }}
+                    />
+                    <span className="admin-upload-title">
+                      {decorImagePreview ? 'Boshqa surat tanlash' : 'Bezak suratini yuklash'}
+                    </span>
+                  </label>
+                </div>
+
+                <div className="admin-locale-tabs" role="tablist" aria-label="Bezak tili">
+                  {(
+                    [
+                      { key: 'uz' as const, label: 'O‘zbekcha', filled: decorNameUz },
+                      { key: 'ru' as const, label: 'Русский', filled: decorNameRu },
+                      { key: 'en' as const, label: 'English', filled: decorNameEn },
+                    ] as const
+                  ).map(({ key, label, filled }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      role="tab"
+                      aria-selected={decorLocaleTab === key}
+                      className={`admin-locale-tab${decorLocaleTab === key ? ' is-active' : ''}${filled.trim() ? ' is-filled' : ''}`}
+                      onClick={() => setDecorLocaleTab(key)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="admin-locale-panel">
+                  {decorLocaleTab === 'uz' && (
+                    <label className="admin-field">
+                      <span>{decorFormLabels.uz.name}</span>
+                      <input
+                        value={decorNameUz}
+                        onChange={(e) => setDecorNameUz(e.target.value)}
+                        required
+                      />
+                    </label>
+                  )}
+                  {decorLocaleTab === 'ru' && (
+                    <label className="admin-field">
+                      <span>{decorFormLabels.ru.name}</span>
+                      <input value={decorNameRu} onChange={(e) => setDecorNameRu(e.target.value)} />
+                    </label>
+                  )}
+                  {decorLocaleTab === 'en' && (
+                    <label className="admin-field">
+                      <span>{decorFormLabels.en.name}</span>
+                      <input value={decorNameEn} onChange={(e) => setDecorNameEn(e.target.value)} />
+                    </label>
+                  )}
+                </div>
+
+                <div className="admin-service-picker">
+                  <div className="admin-service-picker__head">
+                    <span className="admin-service-picker__title">Qaysi xizmatlar uchun</span>
+                    <span className="admin-service-picker__hint">
+                      Standart — barcha xizmatlar. Faqat ba’zilari uchun kerak bo‘lsa, pastdan tanlang.
+                    </span>
+                  </div>
+                  {services.length === 0 ? (
+                    <p className="admin-muted">Avval Xizmatlar bo‘limida kamida bitta xizmat qo‘shing.</p>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className={`admin-service-picker__all${decorServiceIds.length === 0 ? ' is-on' : ''}`}
+                        onClick={setDecorAllServices}
+                      >
+                        <span className="admin-service-picker__all-icon" aria-hidden>
+                          ✓
+                        </span>
+                        Barcha xizmatlar
+                      </button>
+                      <p className="admin-service-picker__or">yoki tanlangan xizmatlar:</p>
+                      <div className="admin-service-chips" role="group" aria-label="Xizmatlar">
+                        {services.map((s) => {
+                          const selected =
+                            decorServiceIds.length > 0 && decorServiceIds.includes(s.id)
+                          return (
+                            <button
+                              key={s.id}
+                              type="button"
+                              className={`admin-service-chip${selected ? ' is-on' : ''}`}
+                              aria-pressed={selected}
+                              onClick={() => toggleDecorService(s.id)}
+                            >
+                              {s.name_uz ?? s.name}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <label className="admin-field admin-field--inline">
+                  <span>Tartib</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={decorSort}
+                    onChange={(e) => setDecorSort(Number(e.target.value))}
+                  />
+                </label>
+
+                <div className="admin-form-actions">
+                  <button type="submit" className="btn btn-primary admin-btn-full" disabled={decorSubmitting}>
+                    {decorSubmitting ? 'Saqlanmoqda…' : decorEditingId ? 'Saqlash' : 'Qo‘shish'}
+                  </button>
+                  {decorEditingId && (
+                    <button type="button" className="admin-btn-ghost" onClick={() => resetDecorForm()}>
+                      Bekor qilish
+                    </button>
+                  )}
+                </div>
+              </form>
+            </section>
+
+            <section className="admin-card admin-card--grow">
+              <h2>Bezaklar ({decorList.length})</h2>
+              {decorList.length === 0 ? (
+                <p className="admin-empty">
+                  Hali bezak yo‘q. Qo‘shing — mijoz buyurtmada tanlay oladi.
+                </p>
+              ) : (
+                <ul className="admin-decor-list">
+                  {decorList.map((d) => (
+                    <li key={d.id} className="admin-decor-item">
+                      <img src={d.image_url} alt="" className="admin-decor-thumb" />
+                      <div className="admin-decor-item-body">
+                        <h3>{d.name_uz}</h3>
+                        <p className="admin-muted">
+                          {(d.service_decors ?? []).length === 0
+                            ? 'Barcha xizmatlar'
+                            : `${(d.service_decors ?? []).length} ta xizmat`}
+                          {' · '}#{d.sort_order}
+                        </p>
+                      </div>
+                      <div className="admin-service-actions">
+                        <button type="button" className="admin-btn-ghost" onClick={() => editDecor(d)}>
+                          Tahrirlash
+                        </button>
+                        <button type="button" className="admin-btn-danger" onClick={() => deleteDecor(d.id)}>
                           O‘chirish
                         </button>
                       </div>

@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import {
   BOOKING_SERVICE_EVENT,
   readPendingBookingService,
 } from '../lib/bookingSelection'
+import { useDecors } from '../hooks/useDecors'
 import { useServices } from '../hooks/useServices'
+import { decorsForService } from '../lib/localizeDecor'
 import { useI18n } from '../i18n/context'
 import { buildBookingMessage } from '../lib/bookingMessage'
 import { sendBookingToTelegram, type TelegramSendResult } from '../lib/bookingTelegram'
 import { useSiteSettings } from '../context/SiteSettingsContext'
+import type { Decor } from '../types/content'
 import './Booking.css'
 
 export default function Booking() {
@@ -15,9 +18,17 @@ export default function Booking() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectedService, setSelectedService] = useState('')
+  const [selectedDecors, setSelectedDecors] = useState<string[]>([])
+  const [previewDecor, setPreviewDecor] = useState<Decor | null>(null)
   const { t } = useI18n()
   const site = useSiteSettings()
   const { services, fromCms } = useServices()
+  const { decors, fromCms: decorsFromCms } = useDecors()
+
+  const availableDecors = useMemo(
+    () => (decorsFromCms && selectedService ? decorsForService(decors, selectedService) : []),
+    [decors, decorsFromCms, selectedService],
+  )
 
   const packageOptions = fromCms
     ? services.map((s) => ({
@@ -37,6 +48,34 @@ export default function Booking() {
     window.addEventListener(BOOKING_SERVICE_EVENT, applyPendingService)
     return () => window.removeEventListener(BOOKING_SERVICE_EVENT, applyPendingService)
   }, [applyPendingService])
+
+  useEffect(() => {
+    setSelectedDecors((prev) => prev.filter((id) => availableDecors.some((d) => d.id === id)))
+  }, [availableDecors])
+
+  useEffect(() => {
+    if (!previewDecor) return
+    if (!availableDecors.some((d) => d.id === previewDecor.id)) {
+      setPreviewDecor(null)
+      return
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setPreviewDecor(null)
+    }
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [previewDecor, availableDecors])
+
+  function toggleDecor(id: string) {
+    setSelectedDecors((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    )
+  }
 
   function errorMessage(result: TelegramSendResult): string {
     if (result.ok) return ''
@@ -59,7 +98,10 @@ export default function Booking() {
     setError('')
 
     const form = e.currentTarget
-    const message = buildBookingMessage(form, t)
+    const decorNames = availableDecors
+      .filter((d) => selectedDecors.includes(d.id))
+      .map((d) => d.name)
+    const message = buildBookingMessage(form, t, { decorNames })
     const result = await sendBookingToTelegram(message)
 
     if (result.ok) {
@@ -144,6 +186,99 @@ export default function Booking() {
                   ))}
                 </select>
               </label>
+
+              {availableDecors.length > 0 && (
+                <fieldset className="booking-decors">
+                  <legend>{t.booking.decorsLabel}</legend>
+                  <p className="booking-decors-hint">{t.booking.decorsHint}</p>
+                  <div className="booking-decor-grid">
+                    {availableDecors.map((decor) => {
+                      const selected = selectedDecors.includes(decor.id)
+                      return (
+                        <div
+                          key={decor.id}
+                          className={`booking-decor-card${selected ? ' is-selected' : ''}`}
+                        >
+                          <button
+                            type="button"
+                            className="booking-decor-card__media"
+                            aria-label={`${t.booking.decorViewLarge}: ${decor.name}`}
+                            onClick={() => setPreviewDecor(decor)}
+                          >
+                            <img
+                              src={decor.image_url}
+                              alt=""
+                              loading="lazy"
+                            />
+                            <span className="booking-decor-card__zoom" aria-hidden>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path
+                                  d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            className="booking-decor-card__toggle"
+                            aria-pressed={selected}
+                            onClick={() => toggleDecor(decor.id)}
+                          >
+                            <span className="booking-decor-card__check" aria-hidden />
+                            <span className="booking-decor-card__name">{decor.name}</span>
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </fieldset>
+              )}
+
+              {previewDecor && (
+                <div
+                  className="booking-decor-lightbox"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="booking-decor-preview-title"
+                >
+                  <button
+                    type="button"
+                    className="booking-decor-lightbox__backdrop"
+                    onClick={() => setPreviewDecor(null)}
+                    aria-label={t.booking.decorPreviewClose}
+                  />
+                  <div className="booking-decor-lightbox__panel">
+                    <button
+                      type="button"
+                      className="booking-decor-lightbox__close"
+                      onClick={() => setPreviewDecor(null)}
+                      aria-label={t.booking.decorPreviewClose}
+                    >
+                      ×
+                    </button>
+                    <div className="booking-decor-lightbox__image-wrap">
+                      <img src={previewDecor.image_url} alt={previewDecor.name} />
+                    </div>
+                    <h3 id="booking-decor-preview-title" className="booking-decor-lightbox__title">
+                      {previewDecor.name}
+                    </h3>
+                    <button
+                      type="button"
+                      className={`btn ${selectedDecors.includes(previewDecor.id) ? 'btn-outline' : 'btn-primary'}`}
+                      onClick={() => toggleDecor(previewDecor.id)}
+                    >
+                      {selectedDecors.includes(previewDecor.id)
+                        ? t.booking.decorPreviewSelected
+                        : t.booking.decorPreviewSelect}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div className="form-row">
                 <label>
                   {t.booking.date}

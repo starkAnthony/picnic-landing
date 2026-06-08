@@ -1,6 +1,10 @@
 import type { Translations } from '../i18n/types'
 
-export function buildBookingMessage(form: HTMLFormElement, t: Translations): string {
+export function buildBookingMessage(
+  form: HTMLFormElement,
+  t: Translations,
+  extras?: { decorNames?: string[] },
+): string {
   const data = new FormData(form)
   const packageSelect = form.elements.namedItem('package') as HTMLSelectElement | null
   const serviceLabel = packageSelect?.selectedOptions[0]?.text ?? String(data.get('package') ?? '')
@@ -14,6 +18,11 @@ export function buildBookingMessage(form: HTMLFormElement, t: Translations): str
     `${t.booking.date}: ${data.get('date')}`,
     `${t.booking.guests}: ${data.get('guests')}`,
   ]
+
+  const decorNames = extras?.decorNames?.filter(Boolean) ?? []
+  if (decorNames.length) {
+    lines.push(`${t.booking.decors}: ${decorNames.join(', ')}`)
+  }
 
   const notes = String(data.get('notes') ?? '').trim()
   if (notes) lines.push(`${t.booking.notes}: ${notes}`)

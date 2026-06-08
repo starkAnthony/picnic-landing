@@ -131,6 +131,13 @@ export type Translations = {
     packageOptions: { value: string; label: string }[]
     date: string
     guests: string
+    decors: string
+    decorsLabel: string
+    decorsHint: string
+    decorViewLarge: string
+    decorPreviewClose: string
+    decorPreviewSelect: string
+    decorPreviewSelected: string
     notes: string
     notesPlaceholder: string
   }
