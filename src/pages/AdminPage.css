@@ -610,17 +610,20 @@
 
 .admin-decor-preview {
   margin-bottom: 0.75rem;
-  max-width: 160px;
+  max-width: 220px;
+  padding: 0.5rem;
   border-radius: var(--radius);
-  overflow: hidden;
+  background: var(--cream);
   border: 1px solid rgba(92, 122, 94, 0.12);
 }
 
 .admin-decor-preview img {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  max-height: 200px;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 .admin-service-picker {
@@ -758,9 +761,14 @@
 .admin-decor-thumb {
   width: 4rem;
   height: 4rem;
-  object-fit: cover;
+  padding: 0.25rem;
+  object-fit: contain;
+  object-position: center;
+  background: var(--white);
+  border: 1px solid rgba(92, 122, 94, 0.12);
   border-radius: calc(var(--radius) - 4px);
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .admin-decor-item-body {
