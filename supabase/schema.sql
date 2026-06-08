@@ -42,6 +42,7 @@ create table if not exists public.site_settings (
   telegram_username text not null default 'tony_not',
   instagram_handle text not null default 'sevinc_picnic',
   instagram_url text,
+  hero_image_url text,
   updated_at timestamptz default now(),
   constraint site_settings_single_row check (id = 1)
 );

@@ -2,13 +2,49 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import {
+  DEFAULT_HERO_IMAGE_URL,
   DEFAULT_INSTAGRAM_HANDLE,
   DEFAULT_PHONE_DISPLAY,
   DEFAULT_TELEGRAM_USERNAME,
   normalizeUsername,
 } from '../site'
-import { uploadGalleryImage, uploadPostImage } from '../lib/uploadImage'
-import type { GalleryItem, Post, Service } from '../types/content'
+import { uploadGalleryImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import { serviceFormLabels } from '../admin/serviceFormLabels'
+import type { GalleryItem, Post, ServiceRecord } from '../types/content'
+import type { Locale } from '../i18n/types'
+
+type ServiceLocaleForm = {
+  name: string
+  desc: string
+  price: string
+  features: string
+}
+
+const emptyServiceLocale = (): ServiceLocaleForm => ({
+  name: '',
+  desc: '',
+  price: '',
+  features: '',
+})
+
+function recordToForm(row: ServiceRecord, locale: Locale): ServiceLocaleForm {
+  const nameKey = `name_${locale}` as keyof ServiceRecord
+  const descKey = `description_${locale}` as keyof ServiceRecord
+  const priceKey = `price_text_${locale}` as keyof ServiceRecord
+  const featKey = `features_${locale}` as keyof ServiceRecord
+
+  const name = (row[nameKey] as string | null) ?? row.name ?? ''
+  const desc = (row[descKey] as string | null) ?? row.description ?? ''
+  const price = (row[priceKey] as string | null) ?? row.price_text ?? ''
+  const feats = (row[featKey] as string[] | null) ?? row.features ?? []
+
+  return {
+    name,
+    desc,
+    price,
+    features: feats.join('\n'),
+  }
+}
 import './AdminPage.css'
 
 export default function AdminPage() {
@@ -19,14 +55,14 @@ export default function AdminPage() {
   const [tab, setTab] = useState<'settings' | 'services' | 'gallery' | 'posts'>('settings')
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [posts, setPosts] = useState<Post[]>([])
-  const [services, setServices] = useState<Service[]>([])
-  const [svcName, setSvcName] = useState('')
-  const [svcDesc, setSvcDesc] = useState('')
-  const [svcPrice, setSvcPrice] = useState('')
-  const [svcFeatures, setSvcFeatures] = useState('')
+  const [services, setServices] = useState<ServiceRecord[]>([])
+  const [svcUz, setSvcUz] = useState<ServiceLocaleForm>(emptyServiceLocale)
+  const [svcRu, setSvcRu] = useState<ServiceLocaleForm>(emptyServiceLocale)
+  const [svcEn, setSvcEn] = useState<ServiceLocaleForm>(emptyServiceLocale)
   const [svcPopular, setSvcPopular] = useState(false)
   const [svcSort, setSvcSort] = useState(0)
   const [svcEditingId, setSvcEditingId] = useState<string | null>(null)
+  const [svcLocaleTab, setSvcLocaleTab] = useState<Locale>('uz')
   const [postTitle, setPostTitle] = useState('')
   const [postBody, setPostBody] = useState('')
   const [postType, setPostType] = useState<'news' | 'event'>('news')
@@ -41,6 +77,8 @@ export default function AdminPage() {
   const [instagramHandle, setInstagramHandle] = useState(DEFAULT_INSTAGRAM_HANDLE)
   const [instagramUrl, setInstagramUrl] = useState('')
   const [settingsSaving, setSettingsSaving] = useState(false)
+  const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
+  const [heroUploading, setHeroUploading] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -68,13 +106,60 @@ export default function AdminPage() {
     ])
     if (g.data) setGallery(g.data as GalleryItem[])
     if (p.data) setPosts(p.data as Post[])
-    if (s.data) setServices(s.data as Service[])
+    if (s.data) setServices(s.data as ServiceRecord[])
     if (settings.data) {
       setPhoneDisplay(settings.data.phone_display ?? DEFAULT_PHONE_DISPLAY)
       setTelegramUsername(normalizeUsername(settings.data.telegram_username ?? DEFAULT_TELEGRAM_USERNAME))
       setInstagramHandle(normalizeUsername(settings.data.instagram_handle ?? DEFAULT_INSTAGRAM_HANDLE))
       setInstagramUrl(settings.data.instagram_url ?? '')
+      setHeroImageUrl(settings.data.hero_image_url ?? null)
     }
+  }
+
+  async function persistSettings(heroUrl: string | null = heroImageUrl) {
+    if (!supabase) return { error: new Error('Supabase not configured') }
+
+    return supabase.from('site_settings').upsert({
+      id: 1,
+      phone_display: phoneDisplay.trim(),
+      telegram_username: normalizeUsername(telegramUsername),
+      instagram_handle: normalizeUsername(instagramHandle),
+      instagram_url: instagramUrl.trim() || null,
+      hero_image_url: heroUrl,
+      updated_at: new Date().toISOString(),
+    })
+  }
+
+  async function uploadHero(file: File) {
+    setHeroUploading(true)
+    setError('')
+
+    const uploaded = await uploadHeroImage(file)
+    if (!uploaded.ok) {
+      setError(uploaded.error)
+      setHeroUploading(false)
+      return
+    }
+
+    const { error: err } = await persistSettings(uploaded.image_url)
+    setHeroUploading(false)
+
+    if (err) {
+      setError(err.message)
+      return
+    }
+
+    setHeroImageUrl(uploaded.image_url)
+  }
+
+  async function clearHeroImage() {
+    setError('')
+    const { error: err } = await persistSettings(null)
+    if (err) {
+      setError(err.message)
+      return
+    }
+    setHeroImageUrl(null)
   }
 
   async function saveSettings(e: FormEvent) {
@@ -83,14 +168,7 @@ export default function AdminPage() {
     setError('')
     setSettingsSaving(true)
 
-    const { error: err } = await supabase.from('site_settings').upsert({
-      id: 1,
-      phone_display: phoneDisplay.trim(),
-      telegram_username: normalizeUsername(telegramUsername),
-      instagram_handle: normalizeUsername(instagramHandle),
-      instagram_url: instagramUrl.trim() || null,
-      updated_at: new Date().toISOString(),
-    })
+    const { error: err } = await persistSettings()
 
     setSettingsSaving(false)
     if (err) {
@@ -107,21 +185,20 @@ export default function AdminPage() {
   }
 
   function resetServiceForm(nextSort = services.length) {
-    setSvcName('')
-    setSvcDesc('')
-    setSvcPrice('')
-    setSvcFeatures('')
+    setSvcUz(emptyServiceLocale())
+    setSvcRu(emptyServiceLocale())
+    setSvcEn(emptyServiceLocale())
     setSvcPopular(false)
     setSvcSort(nextSort)
     setSvcEditingId(null)
+    setSvcLocaleTab('uz')
   }
 
-  function editService(s: Service) {
+  function editService(s: ServiceRecord) {
     setSvcEditingId(s.id)
-    setSvcName(s.name)
-    setSvcDesc(s.description)
-    setSvcPrice(s.price_text)
-    setSvcFeatures(s.features.join('\n'))
+    setSvcUz(recordToForm(s, 'uz'))
+    setSvcRu(recordToForm(s, 'ru'))
+    setSvcEn(recordToForm(s, 'en'))
     setSvcPopular(s.is_popular)
     setSvcSort(s.sort_order)
     setError('')
@@ -132,11 +209,32 @@ export default function AdminPage() {
     if (!supabase) return
     setError('')
 
+    if (!svcUz.name.trim()) {
+      setError('O‘zbekcha nom majburiy.')
+      return
+    }
+
     const payload = {
-      name: svcName.trim(),
-      description: svcDesc.trim(),
-      price_text: svcPrice.trim(),
-      features: parseFeatures(svcFeatures),
+      name_uz: svcUz.name.trim(),
+      name_ru: svcRu.name.trim() || svcUz.name.trim(),
+      name_en: svcEn.name.trim() || svcUz.name.trim(),
+      description_uz: svcUz.desc.trim(),
+      description_ru: svcRu.desc.trim() || svcUz.desc.trim(),
+      description_en: svcEn.desc.trim() || svcUz.desc.trim(),
+      price_text_uz: svcUz.price.trim(),
+      price_text_ru: svcRu.price.trim() || svcUz.price.trim(),
+      price_text_en: svcEn.price.trim() || svcUz.price.trim(),
+      features_uz: parseFeatures(svcUz.features),
+      features_ru: parseFeatures(svcRu.features).length
+        ? parseFeatures(svcRu.features)
+        : parseFeatures(svcUz.features),
+      features_en: parseFeatures(svcEn.features).length
+        ? parseFeatures(svcEn.features)
+        : parseFeatures(svcUz.features),
+      name: svcUz.name.trim(),
+      description: svcUz.desc.trim(),
+      price_text: svcUz.price.trim(),
+      features: parseFeatures(svcUz.features),
       is_popular: svcPopular,
       sort_order: svcSort,
       published: true,
@@ -373,11 +471,44 @@ export default function AdminPage() {
           <section className="admin-card admin-card--narrow admin-settings">
             <h2>Sayt sozlamalari</h2>
             <p className="admin-muted">
-              Telefon, Telegram va Instagram — bosh sahifa, footer va buyurtma bo‘limida ko‘rinadi.
+              Telefon, Telegram, Instagram va bosh sahifadagi katta surat — shu yerdan boshqariladi.
               <br />
               <strong>Eslatma:</strong> Buyurtmalarni qabul qilish (bot token va guruh id) hali Vercel
-              Environment Variables da — bu yerda faqat mijozlarga ko‘rinadigan kontaktlar.
+              Environment Variables da.
             </p>
+
+            <div className="admin-field">
+              <span>Bosh sahifa surati (hero)</span>
+              <div className="admin-hero-preview">
+                <img
+                  src={heroImageUrl ?? DEFAULT_HERO_IMAGE_URL}
+                  alt=""
+                  className="admin-hero-preview-img"
+                />
+              </div>
+              <label className={`admin-upload admin-upload--compact ${heroUploading ? 'is-uploading' : ''}`}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={heroUploading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) uploadHero(file)
+                    e.target.value = ''
+                  }}
+                />
+                <span className="admin-upload-title">
+                  {heroUploading ? 'Yuklanmoqda…' : 'Yangi asosiy surat tanlang'}
+                </span>
+              </label>
+              {heroImageUrl && (
+                <button type="button" className="admin-btn-ghost" onClick={clearHeroImage}>
+                  Standart suratga qaytarish
+                </button>
+              )}
+              <span className="admin-hint">Galereyaga qo‘shilmaydi — faqat yuqoridagi katta rasm almashtiriladi.</span>
+            </div>
+
             <form onSubmit={saveSettings} className="admin-form">
               <label className="admin-field">
                 <span>Telefon (ko‘rinishi)</span>
@@ -425,61 +556,140 @@ export default function AdminPage() {
         )}
 
         {tab === 'services' && (
-          <div className="admin-layout admin-layout--split">
-            <section className="admin-card">
+          <div className="admin-layout admin-layout--split admin-layout--services">
+            <section className="admin-card admin-card--form">
               <h2>{svcEditingId ? 'Xizmatni tahrirlash' : 'Yangi xizmat / narx'}</h2>
-              <p className="admin-muted">
-                Saytdagi xizmat kartochkalari va buyurtma formasi shu yerdan to‘ldiriladi.
+              <p className="admin-muted admin-muted--tight">
+                Tilni tanlang, matnni kiriting. O‘zbekcha majburiy; boshqalar bo‘sh bo‘lsa o‘zbekcha nusxa ishlatiladi.
               </p>
-              <form onSubmit={saveService} className="admin-form">
-                <label className="admin-field">
-                  <span>Nomi</span>
-                  <input value={svcName} onChange={(e) => setSvcName(e.target.value)} required />
-                </label>
-                <label className="admin-field">
-                  <span>Qisqa tavsif</span>
-                  <textarea
-                    rows={3}
-                    value={svcDesc}
-                    onChange={(e) => setSvcDesc(e.target.value)}
-                    required
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Narx (matn)</span>
-                  <input
-                    value={svcPrice}
-                    onChange={(e) => setSvcPrice(e.target.value)}
-                    placeholder="masalan: 1 500 000 so‘m yoki Kelishuv asosida"
-                    required
-                  />
-                </label>
-                <label className="admin-field">
-                  <span>Imkoniyatlar (har qator — bitta punkt)</span>
-                  <textarea
-                    rows={5}
-                    value={svcFeatures}
-                    onChange={(e) => setSvcFeatures(e.target.value)}
-                    placeholder={'Piknik uslubida bezak\nJoylashtirish va yig‘ish'}
-                  />
-                </label>
-                <label className="admin-field admin-field--row">
-                  <input
-                    type="checkbox"
-                    checked={svcPopular}
-                    onChange={(e) => setSvcPopular(e.target.checked)}
-                  />
-                  <span>Eng ko‘p buyurtma (badge)</span>
-                </label>
-                <label className="admin-field">
-                  <span>Tartib (kichik raqam — oldinroq)</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={svcSort}
-                    onChange={(e) => setSvcSort(Number(e.target.value))}
-                  />
-                </label>
+              <form onSubmit={saveService} className="admin-form admin-form--service">
+                <div className="admin-locale-tabs" role="tablist" aria-label="Xizmat tili">
+                  {(
+                    [
+                      { key: 'uz' as const, label: 'O‘zbekcha', form: svcUz },
+                      { key: 'ru' as const, label: 'Русский', form: svcRu },
+                      { key: 'en' as const, label: 'English', form: svcEn },
+                    ] as const
+                  ).map(({ key, label, form }) => (
+                    <button
+                      key={key}
+                      type="button"
+                      role="tab"
+                      aria-selected={svcLocaleTab === key}
+                      className={`admin-locale-tab${svcLocaleTab === key ? ' is-active' : ''}${form.name.trim() ? ' is-filled' : ''}`}
+                      onClick={() => setSvcLocaleTab(key)}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {(
+                  [
+                    { key: 'uz' as const, form: svcUz, set: setSvcUz, required: true },
+                    { key: 'ru' as const, form: svcRu, set: setSvcRu, required: false },
+                    { key: 'en' as const, form: svcEn, set: setSvcEn, required: false },
+                  ] as const
+                )
+                  .filter(({ key }) => key === svcLocaleTab)
+                  .map(({ key, form, set, required }) => {
+                    const L = serviceFormLabels[key]
+                    return (
+                      <div key={key} className="admin-locale-panel" role="tabpanel">
+                        <label className="admin-field">
+                          <span>{L.name}</span>
+                          <input
+                            value={form.name}
+                            onChange={(e) => set({ ...form, name: e.target.value })}
+                            required={required}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>{L.desc}</span>
+                          <textarea
+                            rows={3}
+                            value={form.desc}
+                            onChange={(e) => set({ ...form, desc: e.target.value })}
+                            required={required}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>{L.price}</span>
+                          <input
+                            value={form.price}
+                            onChange={(e) => set({ ...form, price: e.target.value })}
+                            placeholder={L.pricePlaceholder}
+                            required={required}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>{L.features}</span>
+                          <textarea
+                            rows={4}
+                            value={form.features}
+                            onChange={(e) => set({ ...form, features: e.target.value })}
+                            placeholder={L.featuresPlaceholder}
+                          />
+                        </label>
+                      </div>
+                    )
+                  })}
+
+                <div className="admin-options-grid">
+                  <label
+                    className={`admin-option-tile${svcPopular ? ' is-on' : ''}`}
+                    htmlFor="svc-popular"
+                  >
+                    <input
+                      id="svc-popular"
+                      type="checkbox"
+                      className="admin-option-tile__check"
+                      checked={svcPopular}
+                      onChange={(e) => setSvcPopular(e.target.checked)}
+                    />
+                    <div className="admin-option-tile__body">
+                      <span className="admin-option-tile__title">Mashhur xizmat</span>
+                      <span className="admin-option-tile__hint">
+                        Saytda «Eng ko‘p buyurtma» belgisi chiqadi
+                      </span>
+                    </div>
+                    <span className="admin-option-tile__switch" aria-hidden />
+                  </label>
+
+                  <div className="admin-option-tile admin-option-tile--sort">
+                    <div className="admin-option-tile__body">
+                      <span className="admin-option-tile__title">Ko‘rinish tartibi</span>
+                      <span className="admin-option-tile__hint">Kichik raqam — ro‘yxatda oldinroq</span>
+                    </div>
+                    <div className="admin-sort-stepper">
+                      <button
+                        type="button"
+                        className="admin-sort-stepper__btn"
+                        aria-label="Kamaytirish"
+                        onClick={() => setSvcSort((n) => Math.max(0, n - 1))}
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        min={0}
+                        className="admin-sort-stepper__input"
+                        value={svcSort}
+                        onChange={(e) => setSvcSort(Math.max(0, Number(e.target.value) || 0))}
+                        aria-label="Tartib raqami"
+                      />
+                      <button
+                        type="button"
+                        className="admin-sort-stepper__btn"
+                        aria-label="Oshirish"
+                        onClick={() => setSvcSort((n) => n + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="admin-form-actions">
                   <button type="submit" className="btn btn-primary admin-btn-full">
                     {svcEditingId ? 'Saqlash' : 'Qo‘shish'}
@@ -511,9 +721,31 @@ export default function AdminPage() {
                         <span className={`admin-badge ${s.is_popular ? 'admin-badge--event' : 'admin-badge--news'}`}>
                           {s.is_popular ? 'Mashhur' : 'Xizmat'} · #{s.sort_order}
                         </span>
-                        <h3>{s.name}</h3>
-                        <p className="admin-service-price">{s.price_text}</p>
-                        <p className="admin-muted">{s.description.slice(0, 100)}{s.description.length > 100 ? '…' : ''}</p>
+                        <h3>{s.name_uz ?? s.name}</h3>
+                        <div className="admin-locale-chips" aria-label="Tillar">
+                          {(['uz', 'ru', 'en'] as const).map((loc) => {
+                            const filled =
+                              loc === 'uz'
+                                ? Boolean((s.name_uz ?? s.name)?.trim())
+                                : loc === 'ru'
+                                  ? Boolean(s.name_ru?.trim())
+                                  : Boolean(s.name_en?.trim())
+                            return (
+                              <span
+                                key={loc}
+                                className={`admin-locale-chip${filled ? ' is-filled' : ''}`}
+                                title={filled ? `${loc.toUpperCase()} to‘ldirilgan` : `${loc.toUpperCase()} bo‘sh`}
+                              >
+                                {loc.toUpperCase()}
+                              </span>
+                            )
+                          })}
+                        </div>
+                        <p className="admin-service-price">{s.price_text_uz ?? s.price_text}</p>
+                        <p className="admin-muted">
+                          {(s.description_uz ?? s.description ?? '').slice(0, 100)}
+                          {(s.description_uz ?? s.description ?? '').length > 100 ? '…' : ''}
+                        </p>
                       </div>
                       <div className="admin-service-actions">
                         <button type="button" className="admin-btn-ghost" onClick={() => editService(s)}>

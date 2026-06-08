@@ -14,7 +14,7 @@ function readFileAsBase64(file: File): Promise<string> {
   })
 }
 
-type UploadKind = 'gallery' | 'post'
+type UploadKind = 'gallery' | 'post' | 'hero'
 
 export type UploadResult =
   | { ok: true; image_url: string }
@@ -83,7 +83,9 @@ async function uploadImageDirect(file: File, kind: UploadKind): Promise<UploadRe
   if (!supabase) return { ok: false, error: 'Supabase not configured' }
 
   const ext = file.name.split('.').pop() ?? 'jpg'
-  const path = kind === 'post' ? `posts/${Date.now()}.${ext}` : `${Date.now()}.${ext}`
+  const stamp = Date.now()
+  const path =
+    kind === 'post' ? `posts/${stamp}.${ext}` : kind === 'hero' ? `hero/${stamp}.${ext}` : `${stamp}.${ext}`
   const { error: upErr } = await supabase.storage.from('gallery').upload(path, file)
   if (upErr) {
     return {
@@ -113,4 +115,8 @@ export function uploadGalleryImage(file: File): Promise<UploadResult> {
 
 export function uploadPostImage(file: File): Promise<UploadResult> {
   return uploadImageFile(file, 'post')
+}
+
+export function uploadHeroImage(file: File): Promise<UploadResult> {
+  return uploadImageFile(file, 'hero')
 }

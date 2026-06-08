@@ -1,9 +1,10 @@
-import { heroImage as staticHero } from '../data/gallery'
+import { useSiteSettings } from '../context/SiteSettingsContext'
 import { useI18n } from '../i18n/context'
 import './Hero.css'
 
 export default function Hero() {
   const { t } = useI18n()
+  const { heroImageUrl } = useSiteSettings()
 
   return (
     <section className="hero" id="home">
@@ -44,7 +45,7 @@ export default function Hero() {
           <div className="hero-card hero-card-main">
             <img
               className="hero-card-image"
-              src={staticHero.src}
+              src={heroImageUrl}
               alt={t.hero.imageAlt}
               width={1200}
               height={800}

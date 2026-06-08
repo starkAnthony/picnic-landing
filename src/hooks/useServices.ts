@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { staticServices } from '../data/services'
+import { useI18n } from '../i18n/context'
+import { localizeServices } from '../lib/localizeService'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
-import type { Service } from '../types/content'
+import type { Service, ServiceRecord } from '../types/content'
 
 export function useServices() {
-  const [services, setServices] = useState<Service[]>(staticServices)
+  const { locale } = useI18n()
+  const [records, setRecords] = useState<ServiceRecord[] | null>(null)
   const [loading, setLoading] = useState(isSupabaseConfigured)
-  const [fromCms, setFromCms] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -16,20 +18,25 @@ export function useServices() {
 
     supabase
       .from('services')
-      .select('id, name, description, price_text, price_amount, features, is_popular, sort_order')
+      .select('*')
       .eq('published', true)
       .order('sort_order', { ascending: true })
       .then(({ data, error }) => {
         if (!error && data?.length) {
-          setServices(data as Service[])
-          setFromCms(true)
+          setRecords(data as ServiceRecord[])
         } else {
-          setServices(staticServices)
-          setFromCms(false)
+          setRecords(null)
         }
         setLoading(false)
       })
   }, [])
+
+  const fromCms = records !== null && records.length > 0
+
+  const services: Service[] = useMemo(() => {
+    if (fromCms && records) return localizeServices(records, locale)
+    return staticServices
+  }, [fromCms, records, locale])
 
   return { services, loading, usingCms: isSupabaseConfigured, fromCms }
 }

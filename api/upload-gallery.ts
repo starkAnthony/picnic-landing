@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 type Req = {
   method?: string
   headers?: { authorization?: string }
-  body?: { fileName?: string; contentType?: string; data?: string; kind?: 'gallery' | 'post' }
+  body?: { fileName?: string; contentType?: string; data?: string; kind?: 'gallery' | 'post' | 'hero' }
 }
 
 type Res = {
@@ -41,9 +41,12 @@ export default async function handler(req: Req, res: Res) {
     return res.status(400).json({ error: 'Missing file data' })
   }
 
-  const kind = req.body?.kind === 'post' ? 'post' : 'gallery'
+  const kind =
+    req.body?.kind === 'post' ? 'post' : req.body?.kind === 'hero' ? 'hero' : 'gallery'
   const ext = fileName.split('.').pop()?.toLowerCase() ?? 'jpg'
-  const path = kind === 'post' ? `posts/${Date.now()}.${ext}` : `${Date.now()}.${ext}`
+  const stamp = Date.now()
+  const path =
+    kind === 'post' ? `posts/${stamp}.${ext}` : kind === 'hero' ? `hero/${stamp}.${ext}` : `${stamp}.${ext}`
   const buffer = Buffer.from(data, 'base64')
   const mime = contentType || `image/${ext === 'png' ? 'png' : 'jpeg'}`
 

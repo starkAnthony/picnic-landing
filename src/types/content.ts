@@ -16,6 +16,30 @@ export type Service = {
   sort_order: number
 }
 
+/** Raw row from Supabase (all locales) */
+export type ServiceRecord = {
+  id: string
+  name?: string | null
+  description?: string | null
+  price_text?: string | null
+  price_amount: number | null
+  features?: string[] | null
+  name_uz?: string | null
+  name_ru?: string | null
+  name_en?: string | null
+  description_uz?: string | null
+  description_ru?: string | null
+  description_en?: string | null
+  price_text_uz?: string | null
+  price_text_ru?: string | null
+  price_text_en?: string | null
+  features_uz?: string[] | null
+  features_ru?: string[] | null
+  features_en?: string[] | null
+  is_popular: boolean
+  sort_order: number
+}
+
 export type Post = {
   id: string
   title: string

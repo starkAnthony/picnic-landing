@@ -4,6 +4,7 @@ export const DEFAULT_TELEGRAM_USERNAME = 'tony_not'
 export const DEFAULT_INSTAGRAM_HANDLE = 'sevinc_picnic'
 export const DEFAULT_INSTAGRAM_URL =
   'https://www.instagram.com/sevinc_picnic?igsh=MTRuZmF2aXc0d2V4dA=='
+export const DEFAULT_HERO_IMAGE_URL = '/images/gallery/03.jpg'
 
 /** @deprecated Use useSiteSettings() — kept for backwards compatibility */
 export const INSTAGRAM_URL = DEFAULT_INSTAGRAM_URL
