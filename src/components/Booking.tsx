@@ -245,47 +245,6 @@ export default function Booking() {
                 </fieldset>
               )}
 
-              {previewDecor && (
-                <div
-                  className="booking-decor-lightbox"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="booking-decor-preview-title"
-                >
-                  <button
-                    type="button"
-                    className="booking-decor-lightbox__backdrop"
-                    onClick={() => setPreviewDecor(null)}
-                    aria-label={t.booking.decorPreviewClose}
-                  />
-                  <div className="booking-decor-lightbox__panel">
-                    <button
-                      type="button"
-                      className="booking-decor-lightbox__close"
-                      onClick={() => setPreviewDecor(null)}
-                      aria-label={t.booking.decorPreviewClose}
-                    >
-                      ×
-                    </button>
-                    <div className="booking-decor-lightbox__image-wrap">
-                      <img src={previewDecor.image_url} alt={previewDecor.name} />
-                    </div>
-                    <h3 id="booking-decor-preview-title" className="booking-decor-lightbox__title">
-                      {previewDecor.name}
-                    </h3>
-                    <button
-                      type="button"
-                      className={`btn ${selectedDecors.includes(previewDecor.id) ? 'btn-outline' : 'btn-primary'}`}
-                      onClick={() => toggleDecor(previewDecor.id)}
-                    >
-                      {selectedDecors.includes(previewDecor.id)
-                        ? t.booking.decorPreviewSelected
-                        : t.booking.decorPreviewSelect}
-                    </button>
-                  </div>
-                </div>
-              )}
-
               <div className="form-row">
                 <label>
                   {t.booking.date}
@@ -312,6 +271,47 @@ export default function Booking() {
           )}
         </div>
       </div>
+
+      {previewDecor && (
+        <div
+          className="booking-decor-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="booking-decor-preview-title"
+        >
+          <button
+            type="button"
+            className="booking-decor-lightbox__backdrop"
+            onClick={() => setPreviewDecor(null)}
+            aria-label={t.booking.decorPreviewClose}
+          />
+          <div className="booking-decor-lightbox__panel">
+            <button
+              type="button"
+              className="booking-decor-lightbox__close"
+              onClick={() => setPreviewDecor(null)}
+              aria-label={t.booking.decorPreviewClose}
+            >
+              ×
+            </button>
+            <div className="booking-decor-lightbox__image-wrap">
+              <img src={previewDecor.image_url} alt={previewDecor.name} />
+            </div>
+            <h3 id="booking-decor-preview-title" className="booking-decor-lightbox__title">
+              {previewDecor.name}
+            </h3>
+            <button
+              type="button"
+              className={`btn ${selectedDecors.includes(previewDecor.id) ? 'btn-outline' : 'btn-primary'}`}
+              onClick={() => toggleDecor(previewDecor.id)}
+            >
+              {selectedDecors.includes(previewDecor.id)
+                ? t.booking.decorPreviewSelected
+                : t.booking.decorPreviewSelect}
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
