@@ -8,6 +8,8 @@ export default function InstagramFeed() {
   const site = useSiteSettings()
   const { items, loading, configured } = useInstagramFeed()
 
+  if (!configured) return null
+
   return (
     <section className="instagram-feed" id="instagram">
       <div className="container">
@@ -17,7 +19,7 @@ export default function InstagramFeed() {
 
         {loading && <p className="instagram-loading">{t.instagram.loading}</p>}
 
-        {!loading && configured && items.length > 0 && (
+        {!loading && items.length > 0 && (
           <div className="instagram-grid">
             {items.map((item) => {
               const src =
@@ -36,15 +38,6 @@ export default function InstagramFeed() {
               )
             })}
           </div>
-        )}
-
-        {!loading && !configured && (
-          <p className="instagram-fallback">
-            {t.instagram.notConnected}{' '}
-            <a href={site.instagramUrl} target="_blank" rel="noopener noreferrer">
-              {site.instagramHandle}
-            </a>
-          </p>
         )}
 
         <a href={site.instagramUrl} className="btn btn-outline instagram-cta" target="_blank" rel="noopener noreferrer">
