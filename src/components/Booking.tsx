@@ -195,41 +195,48 @@ export default function Booking() {
                     {availableDecors.map((decor) => {
                       const selected = selectedDecors.includes(decor.id)
                       return (
-                        <div
-                          key={decor.id}
-                          className={`booking-decor-card${selected ? ' is-selected' : ''}`}
-                        >
+                        <div key={decor.id} className="booking-decor-card-wrap">
                           <button
                             type="button"
-                            className="booking-decor-card__media"
-                            aria-label={`${t.booking.decorViewLarge}: ${decor.name}`}
-                            onClick={() => setPreviewDecor(decor)}
-                          >
-                            <img
-                              src={decor.image_url}
-                              alt=""
-                              loading="lazy"
-                            />
-                            <span className="booking-decor-card__zoom" aria-hidden>
-                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path
-                                  d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </span>
-                          </button>
-                          <button
-                            type="button"
-                            className="booking-decor-card__toggle"
+                            className={`booking-decor-card${selected ? ' is-selected' : ''}`}
                             aria-pressed={selected}
                             onClick={() => toggleDecor(decor.id)}
                           >
-                            <span className="booking-decor-card__check" aria-hidden />
+                            <span className="booking-decor-card__image">
+                              <img
+                                src={decor.image_url}
+                                alt=""
+                                loading="lazy"
+                              />
+                              <span className="booking-decor-card__mark" aria-hidden>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                  <path
+                                    d="M5 12l5 5L19 7"
+                                    stroke="currentColor"
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </span>
+                            </span>
                             <span className="booking-decor-card__name">{decor.name}</span>
+                          </button>
+                          <button
+                            type="button"
+                            className="booking-decor-card__expand"
+                            aria-label={`${t.booking.decorViewLarge}: ${decor.name}`}
+                            onClick={() => setPreviewDecor(decor)}
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+                              <path
+                                d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
                           </button>
                         </div>
                       )
