@@ -964,7 +964,7 @@ export default function AdminPage() {
                       <img src={decorImagePreview} alt="" />
                     </div>
                   )}
-                  <label className={`admin-upload admin-upload--compact ${decorSubmitting ? 'is-uploading' : ''}`}>
+                  <label className={`admin-upload ${decorSubmitting ? 'is-uploading' : ''}`}>
                     <input
                       type="file"
                       accept="image/*"
@@ -974,9 +974,17 @@ export default function AdminPage() {
                         e.target.value = ''
                       }}
                     />
-                    <span className="admin-upload-title">
-                      {decorImagePreview ? 'Boshqa surat tanlash' : 'Bezak suratini yuklash'}
+                    <span className="admin-upload-icon" aria-hidden>
+                      📷
                     </span>
+                    <span className="admin-upload-title">
+                      {decorSubmitting
+                        ? 'Yuklanmoqda…'
+                        : decorImagePreview
+                          ? 'Boshqa surat tanlash'
+                          : 'Bezak suratini yuklash'}
+                    </span>
+                    <span className="admin-upload-hint">PNG yoki JPG — buyurtmada ko‘rinadi</span>
                   </label>
                 </div>
 
