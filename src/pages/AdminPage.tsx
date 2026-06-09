@@ -9,6 +9,7 @@ import {
   normalizeUsername,
 } from '../site'
 import { uploadGalleryImage, uploadDecorImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import { AdminUploadIcon } from '../admin/AdminUploadIcon'
 import { decorFormLabels } from '../admin/decorFormLabels'
 import { serviceFormLabels } from '../admin/serviceFormLabels'
 import type { DecorRecord, GalleryItem, Post, ServiceRecord } from '../types/content'
@@ -682,8 +683,12 @@ export default function AdminPage() {
                     e.target.value = ''
                   }}
                 />
-                <span className="admin-upload-title">
-                  {heroUploading ? 'Yuklanmoqda…' : 'Yangi asosiy surat tanlang'}
+                <AdminUploadIcon />
+                <span className="admin-upload-copy">
+                  <span className="admin-upload-title">
+                    {heroUploading ? 'Yuklanmoqda…' : 'Yangi asosiy surat tanlang'}
+                  </span>
+                  <span className="admin-upload-hint">PNG yoki JPG — bosh sahifa katta surati</span>
                 </span>
               </label>
               {heroImageUrl && (
@@ -974,9 +979,7 @@ export default function AdminPage() {
                         e.target.value = ''
                       }}
                     />
-                    <span className="admin-upload-icon" aria-hidden>
-                      📷
-                    </span>
+                    <AdminUploadIcon />
                     <span className="admin-upload-title">
                       {decorSubmitting
                         ? 'Yuklanmoqda…'
@@ -1187,9 +1190,7 @@ export default function AdminPage() {
                     e.target.value = ''
                   }}
                 />
-                <span className="admin-upload-icon" aria-hidden>
-                  📷
-                </span>
+                <AdminUploadIcon />
                 <span className="admin-upload-title">
                   {uploading
                     ? uploadProgress
@@ -1266,8 +1267,16 @@ export default function AdminPage() {
                         e.target.value = ''
                       }}
                     />
-                    <span className="admin-upload-title">
-                      {postImageFile ? postImageFile.name : 'Telefon yoki kompyuterdan surat tanlang'}
+                    <AdminUploadIcon />
+                    <span className="admin-upload-copy">
+                      <span className="admin-upload-title">
+                        {postSubmitting
+                          ? 'Yuklanmoqda…'
+                          : postImageFile
+                            ? postImageFile.name
+                            : 'Telefon yoki kompyuterdan surat tanlang'}
+                      </span>
+                      <span className="admin-upload-hint">PNG yoki JPG — yangilik yoki tadbir uchun</span>
                     </span>
                   </label>
                   {postImagePreview && (

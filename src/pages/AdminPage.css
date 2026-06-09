@@ -845,7 +845,27 @@
 }
 
 .admin-upload-icon {
-  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 50%;
+  background: rgba(92, 122, 94, 0.12);
+  color: var(--sage-dark);
+  flex-shrink: 0;
+}
+
+.admin-upload-icon svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.admin-upload-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
 }
 
 .admin-upload-title {
@@ -856,6 +876,7 @@
 .admin-upload-hint {
   font-size: 0.8rem;
   color: var(--muted);
+  line-height: 1.35;
 }
 
 /* Gallery grid */
@@ -954,12 +975,31 @@
 }
 
 .admin-upload--compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
   min-height: auto;
-  padding: 0.85rem 1rem;
+  padding: 1.25rem 1.35rem;
+  text-align: left;
+}
+
+.admin-upload--compact .admin-upload-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+.admin-upload--compact .admin-upload-icon svg {
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.admin-upload--compact .admin-upload-copy {
+  text-align: left;
 }
 
 .admin-upload--compact .admin-upload-title {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
 .admin-image-preview img {
