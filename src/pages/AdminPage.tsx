@@ -1077,15 +1077,38 @@ export default function AdminPage() {
                   )}
                 </div>
 
-                <label className="admin-field admin-field--inline">
-                  <span>Tartib</span>
-                  <input
-                    type="number"
-                    min={0}
-                    value={decorSort}
-                    onChange={(e) => setDecorSort(Number(e.target.value))}
-                  />
-                </label>
+                <div className="admin-option-tile admin-option-tile--sort">
+                  <div className="admin-option-tile__body">
+                    <span className="admin-option-tile__title">Ko‘rinish tartibi</span>
+                    <span className="admin-option-tile__hint">Kichik raqam — ro‘yxatda oldinroq</span>
+                  </div>
+                  <div className="admin-sort-stepper">
+                    <button
+                      type="button"
+                      className="admin-sort-stepper__btn"
+                      aria-label="Kamaytirish"
+                      onClick={() => setDecorSort((n) => Math.max(0, n - 1))}
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min={0}
+                      className="admin-sort-stepper__input"
+                      value={decorSort}
+                      onChange={(e) => setDecorSort(Math.max(0, Number(e.target.value) || 0))}
+                      aria-label="Tartib raqami"
+                    />
+                    <button
+                      type="button"
+                      className="admin-sort-stepper__btn"
+                      aria-label="Oshirish"
+                      onClick={() => setDecorSort((n) => n + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
 
                 <div className="admin-form-actions">
                   <button type="submit" className="btn btn-primary admin-btn-full" disabled={decorSubmitting}>
