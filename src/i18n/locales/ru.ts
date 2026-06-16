@@ -64,6 +64,7 @@ const ru: Translations = {
     subtitle:
       'Sevinc Picnic — декор, организация и аренда для встреч, праздников и особых моментов на природе.',
     popularBadge: 'Чаще всего заказывают',
+    customBadge: 'Индивидуальный проект',
     priceOnRequest: 'Цена по запросу',
     select: 'Заказать услугу',
     loading: 'Загрузка…',
@@ -184,6 +185,7 @@ const ru: Translations = {
       { value: 'photo-zone', label: 'Оформленная фотозона' },
       { value: 'event-design', label: 'Дизайн и организация праздника' },
       { value: 'rental', label: 'Аренда пикникового инвентаря' },
+      { value: 'custom', label: 'Индивидуальный проект / свой дизайн' },
       { value: 'combo', label: 'Несколько услуг (комплекс)' },
     ],
     date: 'Дата мероприятия',
@@ -197,6 +199,13 @@ const ru: Translations = {
     decorPreviewSelected: 'Выбрано',
     notes: 'Дополнительно',
     notesPlaceholder: 'Тип события, тема, место, особые пожелания...',
+    customBriefLabel: 'О вашем проекте',
+    customBriefHint:
+      'Опишите тему, цвета, декор, место и пожелания — на этой основе мы спланируем дизайн.',
+    customBriefPlaceholder:
+      'Например: романтическое предложение, белый и розовый, свечи, у реки, 2 гостя...',
+    customRequired: 'Для индивидуального проекта нужно описание.',
+    customTelegramTag: 'ИНДИВИДУАЛЬНЫЙ ПРОЕКТ',
     submit: 'Отправить заявку',
   },
   footer: {

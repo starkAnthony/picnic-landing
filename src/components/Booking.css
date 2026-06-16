@@ -173,6 +173,28 @@
   line-height: 1.4;
 }
 
+.booking-custom {
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius);
+  background: rgba(92, 122, 94, 0.08);
+  border: 1px solid rgba(92, 122, 94, 0.18);
+}
+
+.booking-custom label {
+  margin: 0;
+}
+
+.booking-custom textarea {
+  min-height: 7rem;
+}
+
+.booking-custom-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .booking-decor-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(6.75rem, 100%), 1fr));

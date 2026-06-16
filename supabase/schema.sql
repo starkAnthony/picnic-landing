@@ -18,6 +18,7 @@ create table if not exists public.services (
   price_amount numeric,
   features text[] not null default '{}',
   is_popular boolean not null default false,
+  is_custom boolean not null default false,
   sort_order int not null default 0,
   published boolean not null default true,
   created_at timestamptz default now()

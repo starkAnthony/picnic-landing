@@ -88,6 +88,7 @@ export type Translations = {
     title: string
     subtitle: string
     popularBadge: string
+    customBadge: string
     priceOnRequest: string
     select: string
     loading: string
@@ -140,6 +141,11 @@ export type Translations = {
     decorPreviewSelected: string
     notes: string
     notesPlaceholder: string
+    customBriefLabel: string
+    customBriefHint: string
+    customBriefPlaceholder: string
+    customRequired: string
+    customTelegramTag: string
   }
   footer: {
     tagline: string

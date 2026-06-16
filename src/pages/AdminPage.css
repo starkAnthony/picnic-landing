@@ -395,6 +395,11 @@
   border: 1px solid rgba(92, 122, 94, 0.12);
 }
 
+.admin-option-tile--full {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
 .admin-options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

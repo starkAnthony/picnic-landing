@@ -64,6 +64,7 @@ const uz: Translations = {
     subtitle:
       'Sevinc Picnic — ochiq havoda uchrashuvlar, bayramlar va maxsus lahzalar uchun bezak, tashkillashtirish va ijaraga berish.',
     popularBadge: 'Eng ko‘p buyurtma',
+    customBadge: 'Individual loyiha',
     priceOnRequest: 'Narx — kelishuv asosida',
     select: 'Buyurtma berish',
     loading: 'Yuklanmoqda…',
@@ -185,6 +186,7 @@ const uz: Translations = {
       { value: 'photo-zone', label: 'Bezakli foto zona' },
       { value: 'event-design', label: 'Tadbir dizayni va tashkillashtirish' },
       { value: 'rental', label: 'Piknik buyumlarini ijaraga berish' },
+      { value: 'custom', label: 'Individual loyiha / maxsus dizayn' },
       { value: 'combo', label: 'Bir nechta xizmat (kombinatsiya)' },
     ],
     date: 'Tadbir sanasi',
@@ -198,6 +200,13 @@ const uz: Translations = {
     decorPreviewSelected: 'Tanlangan',
     notes: 'Qo‘shimcha ma’lumot',
     notesPlaceholder: 'Tadbir turi, mavzu, joy, maxsus istaklar...',
+    customBriefLabel: 'Loyihangiz haqida',
+    customBriefHint:
+      'Mavzu, ranglar, bezak, joy va maxsus istaklaringizni yozing — dizaynni shu asosida rejalashtiramiz.',
+    customBriefPlaceholder:
+      'Masalan: romantik taklif, oq va pushti ranglar, shamollar, daryo bo‘yi, 2 kishi...',
+    customRequired: 'Individual loyiha uchun tavsif yozing.',
+    customTelegramTag: 'MAXSUS LOYIHA',
     submit: 'So‘rov yuborish',
   },
   footer: {

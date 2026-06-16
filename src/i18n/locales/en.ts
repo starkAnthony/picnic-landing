@@ -63,6 +63,7 @@ const en: Translations = {
     subtitle:
       'Sevinc Picnic — décor, planning, and rentals for outdoor gatherings, parties, and special moments.',
     popularBadge: 'Most booked',
+    customBadge: 'Custom project',
     priceOnRequest: 'Price on request',
     select: 'Request this service',
     loading: 'Loading…',
@@ -183,6 +184,7 @@ const en: Translations = {
       { value: 'photo-zone', label: 'Decorated photo zone' },
       { value: 'event-design', label: 'Event design & organization' },
       { value: 'rental', label: 'Picnic equipment rental' },
+      { value: 'custom', label: 'Custom project / bespoke design' },
       { value: 'combo', label: 'Multiple services (bundle)' },
     ],
     date: 'Event date',
@@ -196,6 +198,13 @@ const en: Translations = {
     decorPreviewSelected: 'Selected',
     notes: 'Additional details',
     notesPlaceholder: 'Event type, theme, location, special requests...',
+    customBriefLabel: 'About your project',
+    customBriefHint:
+      'Describe your theme, colors, décor, location, and wishes — we will plan the design from this.',
+    customBriefPlaceholder:
+      'E.g. romantic proposal, white and blush, candles, by the river, 2 guests...',
+    customRequired: 'Please describe your custom project.',
+    customTelegramTag: 'CUSTOM PROJECT',
     submit: 'Send request',
   },
   footer: {

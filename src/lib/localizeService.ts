@@ -55,6 +55,7 @@ export function localizeService(row: ServiceRecord, locale: Locale): Service {
       row.features,
     ),
     is_popular: row.is_popular,
+    is_custom: row.is_custom ?? false,
     sort_order: row.sort_order,
   }
 }

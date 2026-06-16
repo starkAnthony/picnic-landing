@@ -13,6 +13,7 @@ export type Service = {
   price_amount: number | null
   features: string[]
   is_popular: boolean
+  is_custom: boolean
   sort_order: number
 }
 
@@ -37,6 +38,7 @@ export type ServiceRecord = {
   features_ru?: string[] | null
   features_en?: string[] | null
   is_popular: boolean
+  is_custom: boolean
   sort_order: number
 }
 

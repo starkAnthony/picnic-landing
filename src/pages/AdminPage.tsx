@@ -94,6 +94,7 @@ export default function AdminPage() {
   const [svcRu, setSvcRu] = useState<ServiceLocaleForm>(emptyServiceLocale)
   const [svcEn, setSvcEn] = useState<ServiceLocaleForm>(emptyServiceLocale)
   const [svcPopular, setSvcPopular] = useState(false)
+  const [svcCustom, setSvcCustom] = useState(false)
   const [svcSort, setSvcSort] = useState(0)
   const [svcEditingId, setSvcEditingId] = useState<string | null>(null)
   const [svcLocaleTab, setSvcLocaleTab] = useState<Locale>('uz')
@@ -238,6 +239,7 @@ export default function AdminPage() {
     setSvcRu(emptyServiceLocale())
     setSvcEn(emptyServiceLocale())
     setSvcPopular(false)
+    setSvcCustom(false)
     setSvcSort(nextSort)
     setSvcEditingId(null)
     setSvcLocaleTab('uz')
@@ -249,6 +251,7 @@ export default function AdminPage() {
     setSvcRu(recordToForm(s, 'ru'))
     setSvcEn(recordToForm(s, 'en'))
     setSvcPopular(s.is_popular)
+    setSvcCustom(s.is_custom ?? false)
     setSvcSort(s.sort_order)
     setError('')
   }
@@ -285,6 +288,7 @@ export default function AdminPage() {
       price_text: svcUz.price.trim(),
       features: parseFeatures(svcUz.features),
       is_popular: svcPopular,
+      is_custom: svcCustom,
       sort_order: svcSort,
       published: true,
     }
@@ -872,6 +876,27 @@ export default function AdminPage() {
                       </div>
                     )
                   })}
+
+                <label
+                  className={`admin-option-tile admin-option-tile--full${svcCustom ? ' is-on' : ''}`}
+                  htmlFor="svc-custom"
+                >
+                  <input
+                    id="svc-custom"
+                    type="checkbox"
+                    className="admin-option-tile__check"
+                    checked={svcCustom}
+                    onChange={(e) => setSvcCustom(e.target.checked)}
+                  />
+                  <div className="admin-option-tile__body">
+                    <span className="admin-option-tile__title">Individual loyiha</span>
+                    <span className="admin-option-tile__hint">
+                      Mijoz o‘z dizayni bo‘yicha buyurtma qiladi — maxsus tavsif maydoni ochiladi, bezaklar
+                      ro‘yxati yashirinadi
+                    </span>
+                  </div>
+                  <span className="admin-option-tile__switch" aria-hidden />
+                </label>
 
                 <div className="admin-options-grid">
                   <label

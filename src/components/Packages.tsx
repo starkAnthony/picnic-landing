@@ -26,10 +26,13 @@ export default function Packages() {
             {services.map((pkg) => (
               <article
                 key={pkg.id}
-                className={`package-card ${pkg.is_popular ? 'popular' : ''}`}
+                className={`package-card${pkg.is_popular ? ' popular' : ''}${pkg.is_custom ? ' custom' : ''}`}
               >
                 {pkg.is_popular && (
                   <span className="package-badge">{t.packages.popularBadge}</span>
+                )}
+                {pkg.is_custom && !pkg.is_popular && (
+                  <span className="package-badge package-badge--custom">{t.packages.customBadge}</span>
                 )}
                 <h3>{pkg.name}</h3>
                 <p className="package-desc">{pkg.description}</p>

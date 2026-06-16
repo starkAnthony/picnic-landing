@@ -16,6 +16,7 @@ export const staticServices: Service[] = [
       'Joylashtirish va yig‘ish',
     ],
     is_popular: true,
+    is_custom: false,
     sort_order: 0,
   },
   {
@@ -32,6 +33,7 @@ export const staticServices: Service[] = [
       'Shaxsiy dizayn va dekor',
     ],
     is_popular: false,
+    is_custom: false,
     sort_order: 1,
   },
   {
@@ -48,6 +50,24 @@ export const staticServices: Service[] = [
       'Muddat va miqdor bo‘yicha moslash',
     ],
     is_popular: false,
+    is_custom: false,
     sort_order: 2,
+  },
+  {
+    id: 'static-custom',
+    name: 'Individual loyiha / maxsus dizayn',
+    description:
+      'O‘z qoidalaringiz, mavzu va dizayningiz bo‘yicha to‘liq moslashtirilgan marosim — bezak, joylash va tafsilotlarni birga rejalashtiramiz.',
+    price_text: 'Kelishuv asosida',
+    price_amount: null,
+    features: [
+      'Shaxsiy mavzu va ranglar',
+      'Maxsus bezak va joylash rejalari',
+      'Taklif, tug‘ilgan kun, uchrashuv va boshqalar',
+      'Maslahat va narx — loyiha bo‘yicha',
+    ],
+    is_popular: false,
+    is_custom: true,
+    sort_order: 3,
   },
 ]

@@ -41,6 +41,11 @@
   box-shadow: var(--shadow-lg);
 }
 
+.package-card.custom {
+  background: var(--white);
+  border-color: var(--sage);
+}
+
 .package-badge {
   position: absolute;
   top: -0.65rem;
@@ -53,6 +58,10 @@
   text-transform: uppercase;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
+}
+
+.package-badge--custom {
+  background: var(--sage);
 }
 
 .package-card h3 {

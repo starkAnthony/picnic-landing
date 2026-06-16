@@ -25,9 +25,19 @@ export default function Booking() {
   const { services, fromCms } = useServices()
   const { decors, fromCms: decorsFromCms } = useDecors()
 
+  const isCustomService = useMemo(() => {
+    if (!selectedService) return false
+    const match = services.find((s) => s.id === selectedService)
+    if (match) return match.is_custom
+    return selectedService === 'custom' || selectedService === 'static-custom'
+  }, [selectedService, services])
+
   const availableDecors = useMemo(
-    () => (decorsFromCms && selectedService ? decorsForService(decors, selectedService) : []),
-    [decors, decorsFromCms, selectedService],
+    () =>
+      decorsFromCms && selectedService && !isCustomService
+        ? decorsForService(decors, selectedService)
+        : [],
+    [decors, decorsFromCms, selectedService, isCustomService],
   )
 
   const packageOptions = fromCms
@@ -98,10 +108,24 @@ export default function Booking() {
     setError('')
 
     const form = e.currentTarget
+    const customBrief = isCustomService
+      ? String(new FormData(form).get('custom_brief') ?? '').trim()
+      : ''
+
+    if (isCustomService && !customBrief) {
+      setError(t.booking.customRequired)
+      setSubmitting(false)
+      return
+    }
+
     const decorLines = availableDecors
       .filter((d) => selectedDecors.includes(d.id))
       .map((d) => formatDecorLabel(d, t.packages.priceOnRequest))
-    const message = buildBookingMessage(form, t, { decorLines })
+    const message = buildBookingMessage(form, t, {
+      decorLines,
+      customBrief,
+      customTag: t.booking.customTelegramTag,
+    })
     const result = await sendBookingToTelegram(message)
 
     if (result.ok) {
@@ -186,6 +210,21 @@ export default function Booking() {
                   ))}
                 </select>
               </label>
+
+              {isCustomService && (
+                <div className="booking-custom">
+                  <label>
+                    {t.booking.customBriefLabel}
+                    <textarea
+                      name="custom_brief"
+                      rows={5}
+                      required
+                      placeholder={t.booking.customBriefPlaceholder}
+                    />
+                  </label>
+                  <p className="booking-custom-hint">{t.booking.customBriefHint}</p>
+                </div>
+              )}
 
               {availableDecors.length > 0 && (
                 <fieldset className="booking-decors">
