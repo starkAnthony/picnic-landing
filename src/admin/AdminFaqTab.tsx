@@ -1,6 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import AdminConfirmDialog from './AdminConfirmDialog'
+import { faqFormLabels } from './trustFormLabels'
 import { supabase } from '../lib/supabase'
+import { localizeFaq } from '../lib/localizeTrust'
 import type { FaqRecord } from '../types/content'
 import type { Locale } from '../i18n/types'
 
@@ -153,10 +155,12 @@ export default function AdminFaqTab({ setError }: Props) {
 
             {localeForms
               .filter(({ key }) => key === localeTab)
-              .map(({ key, form, set, required }) => (
+              .map(({ key, form, set, required }) => {
+                const L = faqFormLabels[key]
+                return (
                 <div key={key} className="admin-locale-panel">
                   <label className="admin-field">
-                    <span>Savol</span>
+                    <span>{L.question}</span>
                     <input
                       value={form.question}
                       onChange={(e) => set({ ...form, question: e.target.value })}
@@ -164,7 +168,7 @@ export default function AdminFaqTab({ setError }: Props) {
                     />
                   </label>
                   <label className="admin-field">
-                    <span>Javob</span>
+                    <span>{L.answer}</span>
                     <textarea
                       rows={4}
                       value={form.answer}
@@ -173,7 +177,7 @@ export default function AdminFaqTab({ setError }: Props) {
                     />
                   </label>
                 </div>
-              ))}
+              )})}
 
             <div className="admin-option-tile admin-option-tile--sort">
               <div className="admin-option-tile__body">
@@ -223,11 +227,13 @@ export default function AdminFaqTab({ setError }: Props) {
             <p className="admin-muted">Hali savol yo‘q — standart matnlar ko‘rsatiladi.</p>
           ) : (
             <ul className="admin-list">
-              {list.map((row) => (
+              {list.map((row) => {
+                const preview = localizeFaq(row, localeTab)
+                return (
                 <li key={row.id} className="admin-list-item">
                   <div className="admin-list-item__main">
-                    <strong>{row.question_uz}</strong>
-                    <p className="admin-list-item__desc">{row.answer_uz}</p>
+                    <strong>{preview.question}</strong>
+                    <p className="admin-list-item__desc">{preview.answer}</p>
                   </div>
                   <div className="admin-list-item__actions">
                     <button type="button" className="admin-btn-ghost" onClick={() => startEdit(row)}>
@@ -242,7 +248,7 @@ export default function AdminFaqTab({ setError }: Props) {
                     </button>
                   </div>
                 </li>
-              ))}
+              )})}
             </ul>
           )}
         </section>

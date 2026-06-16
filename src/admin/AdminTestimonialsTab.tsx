@@ -1,7 +1,9 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import AdminConfirmDialog from './AdminConfirmDialog'
 import { AdminUploadIcon } from './AdminUploadIcon'
+import { testimonialFormLabels } from './trustFormLabels'
 import { uploadTestimonialImage } from '../lib/uploadImage'
+import { localizeTestimonial } from '../lib/localizeTrust'
 import { supabase } from '../lib/supabase'
 import type { TestimonialRecord } from '../types/content'
 import type { Locale } from '../i18n/types'
@@ -212,10 +214,12 @@ export default function AdminTestimonialsTab({ setError }: Props) {
 
             {localeForms
               .filter(({ key }) => key === localeTab)
-              .map(({ key, form, set, required }) => (
+              .map(({ key, form, set, required }) => {
+                const L = testimonialFormLabels[key]
+                return (
                 <div key={key} className="admin-locale-panel">
                   <label className="admin-field">
-                    <span>Sharh</span>
+                    <span>{L.quote}</span>
                     <textarea
                       rows={4}
                       value={form.quote}
@@ -224,16 +228,16 @@ export default function AdminTestimonialsTab({ setError }: Props) {
                     />
                   </label>
                   <label className="admin-field">
-                    <span>Tadbir turi</span>
+                    <span>{L.occasion}</span>
                     <input
                       value={form.occasion}
                       onChange={(e) => set({ ...form, occasion: e.target.value })}
-                      placeholder="Tug‘ilgan kun, taklif..."
+                      placeholder={L.occasionPlaceholder}
                       required={required}
                     />
                   </label>
                 </div>
-              ))}
+              )})}
 
             <div className="admin-option-tile admin-option-tile--sort">
               <div className="admin-option-tile__body">
@@ -283,12 +287,14 @@ export default function AdminTestimonialsTab({ setError }: Props) {
             <p className="admin-muted">Hali sharh yo‘q — standart matnlar ko‘rsatiladi.</p>
           ) : (
             <ul className="admin-list">
-              {list.map((row) => (
+              {list.map((row) => {
+                const preview = localizeTestimonial(row, localeTab)
+                return (
                 <li key={row.id} className="admin-list-item">
                   <div className="admin-list-item__main">
                     <strong>{row.name}</strong>
-                    <span className="admin-muted">{row.occasion_uz}</span>
-                    <p className="admin-list-item__desc">{row.quote_uz}</p>
+                    <span className="admin-muted">{preview.occasion}</span>
+                    <p className="admin-list-item__desc">{preview.quote}</p>
                   </div>
                   <div className="admin-list-item__actions">
                     <button type="button" className="admin-btn-ghost" onClick={() => startEdit(row)}>
@@ -303,7 +309,7 @@ export default function AdminTestimonialsTab({ setError }: Props) {
                     </button>
                   </div>
                 </li>
-              ))}
+              )})}
             </ul>
           )}
         </section>

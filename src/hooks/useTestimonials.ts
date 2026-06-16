@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../i18n/context'
-import { localizeTestimonial } from '../lib/localizeTrust'
+import { localizeTestimonial, testimonialHasLocale } from '../lib/localizeTrust'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import type { Testimonial, TestimonialRecord } from '../types/content'
 
@@ -30,8 +30,7 @@ export function useTestimonials() {
   const fromCms = rows !== null && rows.length > 0
 
   const items: Testimonial[] = useMemo(() => {
-    if (fromCms && rows) return rows.map((row) => localizeTestimonial(row, locale))
-    return t.testimonials.items.map((item, index) => ({
+    const staticItems = t.testimonials.items.map((item, index) => ({
       id: `static-${index}`,
       name: item.name,
       quote: item.quote,
@@ -39,6 +38,15 @@ export function useTestimonials() {
       image_url: null,
       sort_order: index,
     }))
+
+    if (fromCms && rows) {
+      if (locale === 'uz' || testimonialHasLocale(rows, locale)) {
+        return rows.map((row) => localizeTestimonial(row, locale))
+      }
+      return staticItems
+    }
+
+    return staticItems
   }, [fromCms, rows, locale, t.testimonials.items])
 
   return { items, loading, fromCms }

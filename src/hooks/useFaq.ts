@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useI18n } from '../i18n/context'
-import { localizeFaq } from '../lib/localizeTrust'
+import { faqHasLocale, localizeFaq } from '../lib/localizeTrust'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import type { Faq, FaqRecord } from '../types/content'
 
@@ -30,13 +30,21 @@ export function useFaq() {
   const fromCms = rows !== null && rows.length > 0
 
   const items: Faq[] = useMemo(() => {
-    if (fromCms && rows) return rows.map((row) => localizeFaq(row, locale))
-    return t.faq.items.map((item, index) => ({
+    const staticItems = t.faq.items.map((item, index) => ({
       id: `static-${index}`,
       question: item.question,
       answer: item.answer,
       sort_order: index,
     }))
+
+    if (fromCms && rows) {
+      if (locale === 'uz' || faqHasLocale(rows, locale)) {
+        return rows.map((row) => localizeFaq(row, locale))
+      }
+      return staticItems
+    }
+
+    return staticItems
   }, [fromCms, rows, locale, t.faq.items])
 
   return { items, loading, fromCms }

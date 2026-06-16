@@ -12,6 +12,26 @@ function pickText(
   return (map[locale]?.trim() || uz?.trim() || ru?.trim() || en?.trim() || legacy?.trim() || '')
 }
 
+export function testimonialHasLocale(rows: TestimonialRecord[], locale: Locale): boolean {
+  if (locale === 'uz') return true
+  return rows.some((row) => {
+    if (locale === 'ru') {
+      return !!(row.quote_ru?.trim() || row.occasion_ru?.trim())
+    }
+    return !!(row.quote_en?.trim() || row.occasion_en?.trim())
+  })
+}
+
+export function faqHasLocale(rows: FaqRecord[], locale: Locale): boolean {
+  if (locale === 'uz') return true
+  return rows.some((row) => {
+    if (locale === 'ru') {
+      return !!(row.question_ru?.trim() || row.answer_ru?.trim())
+    }
+    return !!(row.question_en?.trim() || row.answer_en?.trim())
+  })
+}
+
 export function localizeTestimonial(row: TestimonialRecord, locale: Locale): Testimonial {
   return {
     id: row.id,
