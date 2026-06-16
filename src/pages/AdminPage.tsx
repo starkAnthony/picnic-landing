@@ -9,6 +9,7 @@ import {
   normalizeUsername,
 } from '../site'
 import { uploadGalleryImage, uploadDecorImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import AdminConfirmDialog from '../admin/AdminConfirmDialog'
 import { AdminUploadIcon } from '../admin/AdminUploadIcon'
 import { decorFormLabels } from '../admin/decorFormLabels'
 import { serviceFormLabels } from '../admin/serviceFormLabels'
@@ -45,6 +46,12 @@ function recordToDecorForm(row: DecorRecord, locale: Locale): DecorLocaleForm {
     (row[priceKey] as string | null) ?? row.price_text_uz ?? row.price_text ?? ''
 
   return { name, price }
+}
+
+type ConfirmDialogState = {
+  title: string
+  message: string
+  onConfirm: () => void
 }
 
 const emptyServiceLocale = (): ServiceLocaleForm => ({
@@ -118,6 +125,7 @@ export default function AdminPage() {
   const [decorEditingId, setDecorEditingId] = useState<string | null>(null)
   const [decorLocaleTab, setDecorLocaleTab] = useState<Locale>('uz')
   const [decorSubmitting, setDecorSubmitting] = useState(false)
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState | null>(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -300,6 +308,16 @@ export default function AdminPage() {
     loadData()
   }
 
+  function requestDeleteService(s: ServiceRecord) {
+    setConfirmDialog({
+      title: 'Xizmatni o‘chirish',
+      message: `«${s.name_uz ?? s.name}» rostdan ham o‘chirilsinmi? Bu amalni qaytarib bo‘lmaydi.`,
+      onConfirm: () => {
+        void deleteService(s.id)
+      },
+    })
+  }
+
   function resetDecorForm(nextSort = decorList.length) {
     setDecorUz(emptyDecorLocale())
     setDecorRu(emptyDecorLocale())
@@ -438,6 +456,16 @@ export default function AdminPage() {
     loadData()
   }
 
+  function requestDeleteDecor(d: AdminDecorRow) {
+    setConfirmDialog({
+      title: 'Bezakni o‘chirish',
+      message: `«${d.name_uz}» rostdan ham o‘chirilsinmi? Bu amalni qaytarib bo‘lmaydi.`,
+      onConfirm: () => {
+        void deleteDecor(d.id)
+      },
+    })
+  }
+
   async function handleLogin(e: FormEvent) {
     e.preventDefault()
     setError('')
@@ -478,6 +506,16 @@ export default function AdminPage() {
   async function deleteGallery(id: string) {
     await supabase?.from('gallery_items').delete().eq('id', id)
     loadData()
+  }
+
+  function requestDeleteGallery(id: string) {
+    setConfirmDialog({
+      title: 'Suratni o‘chirish',
+      message: 'Bu surat galereyadan o‘chirilsinmi? Bu amalni qaytarib bo‘lmaydi.',
+      onConfirm: () => {
+        void deleteGallery(id)
+      },
+    })
   }
 
   function clearPostImage() {
@@ -535,6 +573,16 @@ export default function AdminPage() {
   async function deletePost(id: string) {
     await supabase?.from('posts').delete().eq('id', id)
     loadData()
+  }
+
+  function requestDeletePost(p: Post) {
+    setConfirmDialog({
+      title: 'Postni o‘chirish',
+      message: `«${p.title}» rostdan ham o‘chirilsinmi? Bu amalni qaytarib bo‘lmaydi.`,
+      onConfirm: () => {
+        void deletePost(p.id)
+      },
+    })
   }
 
   if (!isSupabaseConfigured) {
@@ -941,7 +989,7 @@ export default function AdminPage() {
                         <button type="button" className="admin-btn-ghost" onClick={() => editService(s)}>
                           Tahrirlash
                         </button>
-                        <button type="button" className="admin-btn-danger" onClick={() => deleteService(s.id)}>
+                        <button type="button" className="admin-btn-danger" onClick={() => requestDeleteService(s)}>
                           O‘chirish
                         </button>
                       </div>
@@ -1161,7 +1209,7 @@ export default function AdminPage() {
                         <button type="button" className="admin-btn-ghost" onClick={() => editDecor(d)}>
                           Tahrirlash
                         </button>
-                        <button type="button" className="admin-btn-danger" onClick={() => deleteDecor(d.id)}>
+                        <button type="button" className="admin-btn-danger" onClick={() => requestDeleteDecor(d)}>
                           O‘chirish
                         </button>
                       </div>
@@ -1218,7 +1266,7 @@ export default function AdminPage() {
                       <button
                         type="button"
                         className="admin-gallery-delete"
-                        onClick={() => deleteGallery(item.id)}
+                        onClick={() => requestDeleteGallery(item.id)}
                       >
                         O‘chirish
                       </button>
@@ -1322,7 +1370,7 @@ export default function AdminPage() {
                         {p.event_date && <time>{p.event_date}</time>}
                         <p>{p.body.slice(0, 120)}{p.body.length > 120 ? '…' : ''}</p>
                       </div>
-                      <button type="button" className="admin-btn-danger" onClick={() => deletePost(p.id)}>
+                      <button type="button" className="admin-btn-danger" onClick={() => requestDeletePost(p)}>
                         O‘chirish
                       </button>
                     </li>
@@ -1333,6 +1381,19 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+
+      <AdminConfirmDialog
+        open={confirmDialog !== null}
+        title={confirmDialog?.title ?? ''}
+        message={confirmDialog?.message ?? ''}
+        onCancel={() => setConfirmDialog(null)}
+        onConfirm={() => {
+          if (!confirmDialog) return
+          const action = confirmDialog.onConfirm
+          setConfirmDialog(null)
+          action()
+        }}
+      />
     </div>
   )
 }
