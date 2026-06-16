@@ -1,8 +1,10 @@
+import { useTestimonials } from '../hooks/useTestimonials'
 import { useI18n } from '../i18n/context'
 import './Testimonials.css'
 
 export default function Testimonials() {
   const { t } = useI18n()
+  const { items } = useTestimonials()
 
   return (
     <section className="testimonials" id="reviews">
@@ -11,8 +13,11 @@ export default function Testimonials() {
         <h2 className="section-title">{t.testimonials.title}</h2>
 
         <div className="reviews-grid">
-          {t.testimonials.items.map((review) => (
-            <blockquote key={review.name} className="review-card">
+          {items.map((review) => (
+            <blockquote key={review.id} className="review-card">
+              {review.image_url && (
+                <img src={review.image_url} alt="" className="review-avatar" loading="lazy" />
+              )}
               <div className="stars" aria-label={t.testimonials.starsLabel}>
                 ★★★★★
               </div>

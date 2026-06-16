@@ -13,6 +13,7 @@ const en: Translations = {
     news: 'News',
     howItWorks: 'How It Works',
     reviews: 'Reviews',
+    faq: 'FAQ',
     book: 'Book',
     reserve: 'Get in Touch',
     openMenu: 'Open menu',
@@ -146,6 +147,38 @@ const en: Translations = {
           'Rented a picnic table and blankets — we styled it quickly ourselves. Good quality and easy return.',
         name: 'Nilufar A.',
         occasion: 'Rental',
+      },
+    ],
+  },
+  faq: {
+    label: 'FAQ',
+    title: 'Frequently asked questions',
+    subtitle: 'Quick answers on pricing, location, and planning. Contact us for details.',
+    items: [
+      {
+        question: 'How is pricing set?',
+        answer:
+          'Every event is custom — service type, décor, guest count, and location all matter. Message us via the form or Telegram for a quick quote.',
+      },
+      {
+        question: 'Where do you work?',
+        answer:
+          'Mainly Tashkent and nearby areas. Other cities can be arranged — share your date and location.',
+      },
+      {
+        question: 'How far in advance should I book?',
+        answer:
+          'We recommend 3–14 days ahead depending on season and event type. Need something sooner? We will check availability.',
+      },
+      {
+        question: 'What if it rains or weather is bad?',
+        answer:
+          'We watch the forecast closer to the date and discuss options with you: another spot, rescheduling, or adapting the setup.',
+      },
+      {
+        question: 'Is a deposit required?',
+        answer:
+          'For larger events we may agree on a partial deposit. We will explain the terms when you book.',
       },
     ],
   },

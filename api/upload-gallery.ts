@@ -7,7 +7,7 @@ type Req = {
     fileName?: string
     contentType?: string
     data?: string
-    kind?: 'gallery' | 'post' | 'hero' | 'decor'
+    kind?: 'gallery' | 'post' | 'hero' | 'decor' | 'testimonial' | 'how'
   }
 }
 
@@ -46,24 +46,25 @@ export default async function handler(req: Req, res: Res) {
     return res.status(400).json({ error: 'Missing file data' })
   }
 
-  const kind =
-    req.body?.kind === 'post'
-      ? 'post'
-      : req.body?.kind === 'hero'
-        ? 'hero'
-        : req.body?.kind === 'decor'
-          ? 'decor'
-          : 'gallery'
+  const kind = req.body?.kind ?? 'gallery'
+  const allowed = ['gallery', 'post', 'hero', 'decor', 'testimonial', 'how'] as const
+  const uploadKind = allowed.includes(kind as (typeof allowed)[number])
+    ? (kind as (typeof allowed)[number])
+    : 'gallery'
   const ext = fileName.split('.').pop()?.toLowerCase() ?? 'jpg'
   const stamp = Date.now()
   const path =
-    kind === 'post'
+    uploadKind === 'post'
       ? `posts/${stamp}.${ext}`
-      : kind === 'hero'
+      : uploadKind === 'hero'
         ? `hero/${stamp}.${ext}`
-        : kind === 'decor'
+        : uploadKind === 'decor'
           ? `decors/${stamp}.${ext}`
-          : `${stamp}.${ext}`
+          : uploadKind === 'testimonial'
+            ? `testimonials/${stamp}.${ext}`
+            : uploadKind === 'how'
+              ? `how/${stamp}.${ext}`
+              : `${stamp}.${ext}`
   const buffer = Buffer.from(data, 'base64')
   const mime = contentType || `image/${ext === 'png' ? 'png' : 'jpeg'}`
 
@@ -81,7 +82,7 @@ export default async function handler(req: Req, res: Res) {
 
   const { data: urlData } = admin.storage.from('gallery').getPublicUrl(path)
 
-  if (kind === 'gallery') {
+  if (uploadKind === 'gallery') {
     const { count } = await admin.from('gallery_items').select('*', { count: 'exact', head: true })
     const sortOrder = count ?? 0
 

@@ -28,6 +28,11 @@ export type ReviewItem = {
   occasion: string
 }
 
+export type FaqItem = {
+  question: string
+  answer: string
+}
+
 export type Translations = {
   meta: {
     title: string
@@ -39,6 +44,7 @@ export type Translations = {
     news: string
     howItWorks: string
     reviews: string
+    faq: string
     book: string
     reserve: string
     openMenu: string
@@ -105,6 +111,12 @@ export type Translations = {
     title: string
     starsLabel: string
     items: ReviewItem[]
+  }
+  faq: {
+    label: string
+    title: string
+    subtitle: string
+    items: FaqItem[]
   }
   booking: {
     label: string

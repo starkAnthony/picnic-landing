@@ -8,8 +8,10 @@ import {
   DEFAULT_TELEGRAM_USERNAME,
   normalizeUsername,
 } from '../site'
-import { uploadGalleryImage, uploadDecorImage, uploadHeroImage, uploadPostImage } from '../lib/uploadImage'
+import { uploadGalleryImage, uploadDecorImage, uploadHeroImage, uploadHowStepImage, uploadPostImage } from '../lib/uploadImage'
 import AdminConfirmDialog from '../admin/AdminConfirmDialog'
+import AdminFaqTab from '../admin/AdminFaqTab'
+import AdminTestimonialsTab from '../admin/AdminTestimonialsTab'
 import { AdminUploadIcon } from '../admin/AdminUploadIcon'
 import { decorFormLabels } from '../admin/decorFormLabels'
 import { serviceFormLabels } from '../admin/serviceFormLabels'
@@ -86,7 +88,9 @@ export default function AdminPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<'settings' | 'services' | 'decors' | 'gallery' | 'posts'>('settings')
+  const [tab, setTab] = useState<
+    'settings' | 'services' | 'decors' | 'gallery' | 'posts' | 'testimonials' | 'faq'
+  >('settings')
   const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [posts, setPosts] = useState<Post[]>([])
   const [services, setServices] = useState<ServiceRecord[]>([])
@@ -114,6 +118,10 @@ export default function AdminPage() {
   const [settingsSaving, setSettingsSaving] = useState(false)
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
   const [heroUploading, setHeroUploading] = useState(false)
+  const [howStep1Url, setHowStep1Url] = useState<string | null>(null)
+  const [howStep2Url, setHowStep2Url] = useState<string | null>(null)
+  const [howStep3Url, setHowStep3Url] = useState<string | null>(null)
+  const [howStepUploading, setHowStepUploading] = useState<1 | 2 | 3 | null>(null)
   const [decorList, setDecorList] = useState<AdminDecorRow[]>([])
   const [decorUz, setDecorUz] = useState<DecorLocaleForm>(emptyDecorLocale)
   const [decorRu, setDecorRu] = useState<DecorLocaleForm>(emptyDecorLocale)
@@ -163,11 +171,26 @@ export default function AdminPage() {
       setInstagramHandle(normalizeUsername(settings.data.instagram_handle ?? DEFAULT_INSTAGRAM_HANDLE))
       setInstagramUrl(settings.data.instagram_url ?? '')
       setHeroImageUrl(settings.data.hero_image_url ?? null)
+      setHowStep1Url(settings.data.how_step_1_image_url ?? null)
+      setHowStep2Url(settings.data.how_step_2_image_url ?? null)
+      setHowStep3Url(settings.data.how_step_3_image_url ?? null)
     }
   }
 
-  async function persistSettings(heroUrl: string | null = heroImageUrl) {
+  type SettingsPatch = {
+    heroUrl?: string | null
+    howStep1?: string | null
+    howStep2?: string | null
+    howStep3?: string | null
+  }
+
+  async function persistSettings(patch: SettingsPatch = {}) {
     if (!supabase) return { error: new Error('Supabase not configured') }
+
+    const hero = patch.heroUrl !== undefined ? patch.heroUrl : heroImageUrl
+    const how1 = patch.howStep1 !== undefined ? patch.howStep1 : howStep1Url
+    const how2 = patch.howStep2 !== undefined ? patch.howStep2 : howStep2Url
+    const how3 = patch.howStep3 !== undefined ? patch.howStep3 : howStep3Url
 
     return supabase.from('site_settings').upsert({
       id: 1,
@@ -175,7 +198,10 @@ export default function AdminPage() {
       telegram_username: normalizeUsername(telegramUsername),
       instagram_handle: normalizeUsername(instagramHandle),
       instagram_url: instagramUrl.trim() || null,
-      hero_image_url: heroUrl,
+      hero_image_url: hero,
+      how_step_1_image_url: how1,
+      how_step_2_image_url: how2,
+      how_step_3_image_url: how3,
       updated_at: new Date().toISOString(),
     })
   }
@@ -191,7 +217,7 @@ export default function AdminPage() {
       return
     }
 
-    const { error: err } = await persistSettings(uploaded.image_url)
+    const { error: err } = await persistSettings({ heroUrl: uploaded.image_url })
     setHeroUploading(false)
 
     if (err) {
@@ -204,12 +230,57 @@ export default function AdminPage() {
 
   async function clearHeroImage() {
     setError('')
-    const { error: err } = await persistSettings(null)
+    const { error: err } = await persistSettings({ heroUrl: null })
     if (err) {
       setError(err.message)
       return
     }
     setHeroImageUrl(null)
+  }
+
+  async function uploadHowStep(step: 1 | 2 | 3, file: File) {
+    setHowStepUploading(step)
+    setError('')
+
+    const uploaded = await uploadHowStepImage(file)
+    if (!uploaded.ok) {
+      setError(uploaded.error)
+      setHowStepUploading(null)
+      return
+    }
+
+    const patch =
+      step === 1
+        ? { howStep1: uploaded.image_url }
+        : step === 2
+          ? { howStep2: uploaded.image_url }
+          : { howStep3: uploaded.image_url }
+
+    const { error: err } = await persistSettings(patch)
+    setHowStepUploading(null)
+
+    if (err) {
+      setError(err.message)
+      return
+    }
+
+    if (step === 1) setHowStep1Url(uploaded.image_url)
+    else if (step === 2) setHowStep2Url(uploaded.image_url)
+    else setHowStep3Url(uploaded.image_url)
+  }
+
+  async function clearHowStep(step: 1 | 2 | 3) {
+    setError('')
+    const patch =
+      step === 1 ? { howStep1: null } : step === 2 ? { howStep2: null } : { howStep3: null }
+    const { error: err } = await persistSettings(patch)
+    if (err) {
+      setError(err.message)
+      return
+    }
+    if (step === 1) setHowStep1Url(null)
+    else if (step === 2) setHowStep2Url(null)
+    else setHowStep3Url(null)
   }
 
   async function saveSettings(e: FormEvent) {
@@ -678,6 +749,20 @@ export default function AdminPage() {
             </button>
             <button
               type="button"
+              className={tab === 'testimonials' ? 'active' : ''}
+              onClick={() => setTab('testimonials')}
+            >
+              Sharhlar
+            </button>
+            <button
+              type="button"
+              className={tab === 'faq' ? 'active' : ''}
+              onClick={() => setTab('faq')}
+            >
+              Savollar
+            </button>
+            <button
+              type="button"
               className={tab === 'gallery' ? 'active' : ''}
               onClick={() => setTab('gallery')}
             >
@@ -749,6 +834,52 @@ export default function AdminPage() {
                 </button>
               )}
               <span className="admin-hint">Galereyaga qo‘shilmaydi — faqat yuqoridagi katta rasm almashtiriladi.</span>
+            </div>
+
+            <div className="admin-field">
+              <span>«Qanday ishlaydi» bosqich suratlari</span>
+              <p className="admin-muted admin-muted--tight">
+                Uchta bosqich uchun alohida surat. Bo‘sh qolsa, galereyadagi birinchi uchta surat ishlatiladi.
+              </p>
+              <div className="admin-how-steps">
+                {(
+                  [
+                    { step: 1 as const, url: howStep1Url, label: '1-bosqich' },
+                    { step: 2 as const, url: howStep2Url, label: '2-bosqich' },
+                    { step: 3 as const, url: howStep3Url, label: '3-bosqich' },
+                  ] as const
+                ).map(({ step, url, label }) => (
+                  <div key={step} className="admin-how-step">
+                    <span className="admin-how-step__label">{label}</span>
+                    {url && <img src={url} alt="" className="admin-how-step__img" />}
+                    <label
+                      className={`admin-upload admin-upload--compact ${howStepUploading === step ? 'is-uploading' : ''}`}
+                    >
+                      <input
+                        type="file"
+                        accept="image/*"
+                        disabled={howStepUploading !== null}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (file) uploadHowStep(step, file)
+                          e.target.value = ''
+                        }}
+                      />
+                      <AdminUploadIcon />
+                      <span className="admin-upload-copy">
+                        <span className="admin-upload-title">
+                          {howStepUploading === step ? 'Yuklanmoqda…' : url ? 'Almashtirish' : 'Surat yuklash'}
+                        </span>
+                      </span>
+                    </label>
+                    {url && (
+                      <button type="button" className="admin-btn-ghost" onClick={() => clearHowStep(step)}>
+                        O‘chirish
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <form onSubmit={saveSettings} className="admin-form">
@@ -1245,6 +1376,10 @@ export default function AdminPage() {
             </section>
           </div>
         )}
+
+        {tab === 'testimonials' && <AdminTestimonialsTab setError={setError} />}
+
+        {tab === 'faq' && <AdminFaqTab setError={setError} />}
 
         {tab === 'gallery' && (
           <div className="admin-layout">

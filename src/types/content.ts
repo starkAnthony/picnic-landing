@@ -85,3 +85,45 @@ export type InstagramMedia = {
   permalink: string
   timestamp?: string
 }
+
+export type Testimonial = {
+  id: string
+  name: string
+  quote: string
+  occasion: string
+  image_url: string | null
+  sort_order: number
+}
+
+export type TestimonialRecord = {
+  id: string
+  name: string
+  quote_uz: string
+  quote_ru?: string | null
+  quote_en?: string | null
+  occasion_uz: string
+  occasion_ru?: string | null
+  occasion_en?: string | null
+  image_url: string | null
+  sort_order: number
+  published: boolean
+}
+
+export type Faq = {
+  id: string
+  question: string
+  answer: string
+  sort_order: number
+}
+
+export type FaqRecord = {
+  id: string
+  question_uz: string
+  question_ru?: string | null
+  question_en?: string | null
+  answer_uz: string
+  answer_ru?: string | null
+  answer_en?: string | null
+  sort_order: number
+  published: boolean
+}

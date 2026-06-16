@@ -6,6 +6,7 @@ import InstagramFeed from '../components/InstagramFeed'
 import NewsEvents from '../components/NewsEvents'
 import HowItWorks from '../components/HowItWorks'
 import Testimonials from '../components/Testimonials'
+import FAQ from '../components/FAQ'
 import Booking from '../components/Booking'
 import Footer from '../components/Footer'
 
@@ -21,6 +22,7 @@ export default function HomePage() {
         <InstagramFeed />
         <HowItWorks />
         <Testimonials />
+        <FAQ />
         <Booking />
       </main>
       <Footer />

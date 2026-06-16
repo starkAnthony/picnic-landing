@@ -14,7 +14,7 @@ function readFileAsBase64(file: File): Promise<string> {
   })
 }
 
-type UploadKind = 'gallery' | 'post' | 'hero' | 'decor'
+type UploadKind = 'gallery' | 'post' | 'hero' | 'decor' | 'testimonial' | 'how'
 
 export type UploadResult =
   | { ok: true; image_url: string }
@@ -91,7 +91,11 @@ async function uploadImageDirect(file: File, kind: UploadKind): Promise<UploadRe
         ? `hero/${stamp}.${ext}`
         : kind === 'decor'
           ? `decors/${stamp}.${ext}`
-          : `${stamp}.${ext}`
+          : kind === 'testimonial'
+            ? `testimonials/${stamp}.${ext}`
+            : kind === 'how'
+              ? `how/${stamp}.${ext}`
+              : `${stamp}.${ext}`
   const { error: upErr } = await supabase.storage.from('gallery').upload(path, file)
   if (upErr) {
     return {
@@ -129,4 +133,12 @@ export function uploadHeroImage(file: File): Promise<UploadResult> {
 
 export function uploadDecorImage(file: File): Promise<UploadResult> {
   return uploadImageFile(file, 'decor')
+}
+
+export function uploadTestimonialImage(file: File): Promise<UploadResult> {
+  return uploadImageFile(file, 'testimonial')
+}
+
+export function uploadHowStepImage(file: File): Promise<UploadResult> {
+  return uploadImageFile(file, 'how')
 }

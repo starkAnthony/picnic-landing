@@ -23,6 +23,9 @@ export type SiteSettings = {
   instagramHandle: string
   instagramUrl: string
   heroImageUrl: string
+  howStep1ImageUrl: string | null
+  howStep2ImageUrl: string | null
+  howStep3ImageUrl: string | null
 }
 
 const defaults: SiteSettings = {
@@ -34,6 +37,9 @@ const defaults: SiteSettings = {
   instagramHandle: instagramHandle(DEFAULT_INSTAGRAM_HANDLE),
   instagramUrl: DEFAULT_INSTAGRAM_URL,
   heroImageUrl: staticHero.src || DEFAULT_HERO_IMAGE_URL,
+  howStep1ImageUrl: null,
+  howStep2ImageUrl: null,
+  howStep3ImageUrl: null,
 }
 
 type SiteSettingsRow = {
@@ -42,6 +48,9 @@ type SiteSettingsRow = {
   instagram_handle: string
   instagram_url: string | null
   hero_image_url: string | null
+  how_step_1_image_url: string | null
+  how_step_2_image_url: string | null
+  how_step_3_image_url: string | null
 }
 
 function rowToSettings(row: SiteSettingsRow): SiteSettings {
@@ -59,6 +68,9 @@ function rowToSettings(row: SiteSettingsRow): SiteSettings {
     instagramHandle: instagramHandle(igHandle),
     instagramUrl: instagramUrl(igHandle, row.instagram_url),
     heroImageUrl: hero,
+    howStep1ImageUrl: row.how_step_1_image_url?.trim() || null,
+    howStep2ImageUrl: row.how_step_2_image_url?.trim() || null,
+    howStep3ImageUrl: row.how_step_3_image_url?.trim() || null,
   }
 }
 
@@ -72,7 +84,9 @@ export function SiteSettingsProvider({ children }: { children: ReactNode }) {
 
     supabase
       .from('site_settings')
-      .select('phone_display, telegram_username, instagram_handle, instagram_url, hero_image_url')
+      .select(
+        'phone_display, telegram_username, instagram_handle, instagram_url, hero_image_url, how_step_1_image_url, how_step_2_image_url, how_step_3_image_url',
+      )
       .eq('id', 1)
       .maybeSingle()
       .then(({ data, error }) => {

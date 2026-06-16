@@ -13,6 +13,7 @@ export default function Navbar() {
     { href: '#gallery', label: t.nav.gallery },
     { href: '#how-it-works', label: t.nav.howItWorks },
     { href: '#reviews', label: t.nav.reviews },
+    { href: '#faq', label: t.nav.faq },
     { href: '#book', label: t.nav.book },
   ]
 

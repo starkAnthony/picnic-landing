@@ -13,6 +13,7 @@ const uz: Translations = {
     news: 'Yangiliklar',
     howItWorks: 'Qanday ishlaydi',
     reviews: 'Sharhlar',
+    faq: 'Savollar',
     book: 'Bron',
     reserve: 'Bog‘lanish',
     openMenu: 'Menyuni ochish',
@@ -147,6 +148,38 @@ const uz: Translations = {
           'Piknik stoli va adyollalarni ijaraga oldik — o‘zimiz ham tez bezadik. Sifat yaxshi, qaytarish oson bo‘ldi.',
         name: 'Nilufar A.',
         occasion: 'Ijara',
+      },
+    ],
+  },
+  faq: {
+    label: 'Savollar',
+    title: 'Ko‘p so‘raladigan savollar',
+    subtitle: 'Narx, joy va tayyorgarlik haqida qisqa javoblar. Aniqroq ma’lumot uchun biz bilan bog‘laning.',
+    items: [
+      {
+        question: 'Narx qanday belgilanadi?',
+        answer:
+          'Har bir tadbir alohida — xizmat turi, bezak, mehmonlar soni va joyga qarab narx kelishiladi. Forma yoki Telegram orqali yozing, tez javob beramiz.',
+      },
+      {
+        question: 'Qayerda xizmat ko‘rsatasiz?',
+        answer:
+          'Asosan Toshkent va atrofidagi joylarda. Boshqa shaharlar uchun alohida kelishamiz — sanani va manzilni yozib yuboring.',
+      },
+      {
+        question: 'Qancha oldin buyurtma berish kerak?',
+        answer:
+          'Mavsum va tadbir turiga qarab 3–14 kun oldin bog‘lanish tavsiya etiladi. Tezroq kerak bo‘lsa — imkoniyatni tekshirib ko‘ramiz.',
+      },
+      {
+        question: 'Yomg‘ir yoki yomon ob-havo bo‘lsa?',
+        answer:
+          'Sana yaqinlashganda ob-havoni kuzatamiz va siz bilan variantlarni muhokama qilamiz: boshqa joy, vaqt o‘zgartirish yoki bezakni moslashtirish.',
+      },
+      {
+        question: 'Oldindan to‘lov kerakmi?',
+        answer:
+          'Katta tadbirlar uchun qisman oldindan to‘lov kelishiladi. Aniq shartlarni buyurtma vaqtida aytamiz.',
       },
     ],
   },
